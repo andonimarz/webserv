@@ -1,5 +1,22 @@
 parseo del request
 - comprobar las rutas
+- la movida de Diego:
+    "Segun chatgpt, las request post llegan como algo asi:
+    POST /subir_archivo HTTP/1.1
+    Host: ejemplo.com
+    Content-Type: multipart/form-data; boundary=boundary_value
+
+    --boundary_value
+    Content-Disposition: form-data; name="archivo"; filename="archivo.txt"
+
+    Contenido del archivo...
+    --boundary_value--
+
+    La cosa es que me vendría muy comodo que tuvieses dos variables en la request, 
+    una donde guardes el filename y otra donde guardes el contenido del archivo
+    Esto es segun chatgpt, pero tampoco estoy muy seguro si llega 100% asi, pero 
+    seguro que es algo parecido.
+    Para las request que no sea POST puedes dejar esos campos vacios ("")"
 
 parseo del config
 - cualquier numero de server{}
