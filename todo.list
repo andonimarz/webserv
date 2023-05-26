@@ -1,0 +1,12 @@
+parseo del request
+- comprobar las rutas
+
+parseo del config
+- cualquier numero de server{}
+- comprobando las rutas
+- guarda el environment
+- export para el environment
+
+select
+- loops del select para trabajar con distintos fd
+- cerrar el socket solo si lo pone en la request
