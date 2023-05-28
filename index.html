@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello World</title>
+    <title>Formulario de Solicitud POST, DELETE y GET</title>
 </head>
 <body>
-    <h1>Hello World!</h1>
+    <h1>Formulario de Solicitud POST, DELETE y GET</h1>
+    <form action="http://localhost:8080/upload" method="POST" enctype="multipart/form-data">
+        <label for="file">Selecciona un archivo:</label>
+        <input type="file" id="file" name="archivo" required><br><br>
+        <input type="submit" value="Enviar">
+    </form>
+
+    <form action="http://localhost:8080" method="DELETE">
+        <input type="submit" value="Eliminar">
+    </form>
+
+    <form action="http://localhost:8080" method="GET">
+        <input type="submit" value="Obtener">
+    </form>
 </body>
 </html>

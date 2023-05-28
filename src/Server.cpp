@@ -161,10 +161,10 @@ int	Server::handleConnection(int client_socket)
 		throw serverException("Cannot read request");
 		return (1);
 	}
-
+	//std::cout << "BUFFER: \n" << buffer << std::endl;
 	Request req(buffer);
-	std::cout << req << std::endl;
-    std::cout << "REQUEST: \n" << req.getFullRequest() << std::endl; 
+	//std::cout << req << std::endl;
+    //std::cout << "REQUEST: \n" << req.getFullRequest() << std::endl; 
 	this->sendResponse(client_socket);
 	close(client_socket);
 	printMessage("Closing connection");

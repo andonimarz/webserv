@@ -5,6 +5,8 @@
 # include <sstream>
 # include <map>
 # include <vector>
+# include <algorithm>
+# include <string>
 
 # include "web_server.hpp"
 
@@ -28,6 +30,9 @@ class Request
 		std::string	_protocol;
 		std::string _host;
 		std::string _connection;
+		std::string _boundary; //POST
+		std::string _fileName; //POST
+		std::string _fileContent; //POST
 		/* int			_socket;
 
 		std::map<std::string, std::string>	header;
