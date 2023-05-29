@@ -105,13 +105,13 @@ void Request::getInfo(std::string const &str)
                 std::string::size_type bodyStart = str.find(lines[i + 1]) + lines[i + 1].length();
                 std::string::size_type bodyEnd = str.rfind(lines[lines.size() - 1]);
                 this->_fileContent = str.substr(bodyStart + 2, bodyEnd - bodyStart);
-                // std::cout << "===========================================\n";
+                std::cout << "===========================================\n";
                 // std::cout << "-> boundary: " << this->_boundary << std::endl;
                 // std::cout << "-> bodyStart: " << bodyStart << std::endl;
                 // std::cout << "-> bodyEnd: " << bodyEnd << std::endl;
-                // std::cout << "-> FILENAME: " << this->_fileName << std::endl;
-                // std::cout << "-> FILECONTENT: " << this->_fileContent;
-                // std::cout << "===========================================\n";
+                std::cout << "-> FILENAME: " << this->_fileName << std::endl;
+                std::cout << "-> FILECONTENT: " << this->_fileContent;
+                std::cout << "===========================================\n";
             }
         }
     }
@@ -126,7 +126,3 @@ std::ostream & operator<<(std::ostream &ost, const Request &src)
         << "-> HOST: " << src.getHost() << std::endl;
     return ost;
 }
-
-    //Falta connection. hay que gestionarlo por si es "close"
-    //Habría que cerrar del tirón en cuanto se mande la respuesta.
-    //Si es keep-alive hay que mantenerlo encendido.

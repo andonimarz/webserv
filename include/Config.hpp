@@ -42,7 +42,6 @@ class Config
 		int							port;
 		int							client_max_body_size;
 		std::string					conf_body;
-		std::vector<std::string>	conf_servers;
 
 	public:
 		// Constructor
@@ -50,7 +49,7 @@ class Config
 		// Destructor
 		~Config();
 
-		void setBody(std::string &path);
+		//void setBody(std::string &server);
 		std::string getBody(void) const;
 };
 
