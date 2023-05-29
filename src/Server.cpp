@@ -168,6 +168,9 @@ int	Server::handleConnection(int client_socket)
 	this->sendResponse(client_socket);
 	close(client_socket);
 	printMessage("Closing connection");
+	// En función del parámetro connection en request:
+	// si es "close" habría que cerrar en cuanto se mande la respuesta.
+    // Si es keep-alive hay que mantenerlo abierto.
 	return (0);
 }
 

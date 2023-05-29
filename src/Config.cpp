@@ -115,7 +115,12 @@ std::vector<std::string> extractServerBlocks(const std::string& configContent)
             pos = locationClose + 1;
         }
     }
-	for (const auto& element : serverBlocks)
-    	std::cout << "Element: " << element << std::endl;
+
+	std::vector<std::string>::const_iterator it;
+    for (it = serverBlocks.begin(); it != serverBlocks.end(); ++it)
+    {
+        const std::string& element = *it;
+        std::cout << "Element: " << element << std::endl;
+    }
     return serverBlocks;
 }
