@@ -6,8 +6,8 @@
 #include "Server.hpp"
 #include "utils.hpp"
 #include "Request.hpp"
-
-#define BUFFER_SIZE 1024
+#include "Response.hpp"
+#include "web_server.hpp"
 
 // ===== Constructor =====
 Server::Server(Config config)
@@ -18,13 +18,13 @@ Server::Server(Config config)
 	this->_socketAddress.sin_family = AF_INET;
 	this->_socketAddress.sin_port = htons(this->_port);
 	this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ip_address.c_str());
-	this->_serverResponse = this->buildResponse();
+	// this->_serverResponse = this->buildResponse();
 }
 
 // ===== Destructor =====
 Server::~Server()
 {
-	close(this->_socket); // PUEDE GENERAR ERRORES?
+	close(this->_socket);
 }
 
 // ===== Methods =====
@@ -79,7 +79,7 @@ int	Server::startListen(void)
 		for (int i = 0; i <= max_socket; i++)
 		{
 			if (!FD_ISSET(i, &ready_sockets))
-				continue ;
+				continue ; // write_set?
 			if (i == this->_socket)
 			{
 				// New connection
@@ -110,6 +110,40 @@ int	Server::acceptConnection(void)
 	}
 	return (new_socket);
 }
+
+int	Server::handleConnection(int client_socket)
+{
+	char	buffer[BUFFER_SIZE];
+	
+	bzero(buffer, BUFFER_SIZE);
+	if (read(client_socket, buffer, BUFFER_SIZE) < 0)
+	{
+		throw serverException("Cannot read request");
+		return (1);
+	}
+
+	Request request(buffer);
+	Response response(request);
+	response.generateResponse();
+	_serverResponse = response._fullResponse;
+	sendResponse(client_socket);
+	close(client_socket);
+	printMessage("Closing connection");
+	return (0);
+}
+
+// ===== Exception =====
+Server::serverException::serverException(const char *error)
+{
+	this->_error = (char *)error;
+	return ;
+};
+const char *Server::serverException::what() const throw()
+{
+	return (this->_error);
+};
+
+
 
 std::string Server::buildResponse()
 {
@@ -150,37 +184,3 @@ void Server::sendResponse(int client_socket)
 		printMessage("Error sending response to client");
 	}
 }
-
-int	Server::handleConnection(int client_socket)
-{
-	char	buffer[BUFFER_SIZE];
-	
-	bzero(buffer, BUFFER_SIZE);
-	if (read(client_socket, buffer, BUFFER_SIZE) < 0)
-	{
-		throw serverException("Cannot read request");
-		return (1);
-	}
-	//std::cout << "BUFFER: \n" << buffer << std::endl;
-	Request req(buffer);
-	//std::cout << req << std::endl;
-    //std::cout << "REQUEST: \n" << req.getFullRequest() << std::endl; 
-	this->sendResponse(client_socket);
-	close(client_socket);
-	printMessage("Closing connection");
-	// En función del parámetro connection en request:
-	// si es "close" habría que cerrar en cuanto se mande la respuesta.
-    // Si es keep-alive hay que mantenerlo abierto.
-	return (0);
-}
-
-// ===== Exception =====
-Server::serverException::serverException(const char *error)
-{
-	this->_error = (char *)error;
-	return ;
-};
-const char *Server::serverException::what() const throw()
-{
-	return (this->_error);
-};

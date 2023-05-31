@@ -1,18 +1,19 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
-# include <vector>
-# include <iostream>
-# include <fstream>
-# include <sstream>
-# include <regex>
-
 # include "web_server.hpp"
+// #include "Server.hpp"
+# include <vector>
+# include <map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <regex>
+#include <string>
 
 // En esta clase se parsea y guardan todos los datos extraidos de un archivo de configuración
 class Config
 {
-
 	// Estructuras de datos de un servidor
 	public:
 		typedef struct s_error_page
@@ -51,6 +52,15 @@ class Config
 
 		//void setBody(std::string &server);
 		std::string getBody(void) const;
+		const std::map<std::string, std::string> &getEnvironment() const;
+    	void setEnv(char** env);
+		void printEnv(void) const;
+		void exportEnv(const std::string &key, const std::string &value);
+		void fillFields(const std::string &src);
+
+	private:
+		std::map<std::string, std::string> environment;
+		std::vector<t_location> locations;
 };
 
 std::vector<std::string> extractServerBlocks(const std::string &filePath);

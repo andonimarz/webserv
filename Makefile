@@ -5,13 +5,14 @@ INC_DIR			=	include
 
 RM				=	rm -rf
 CC				=	c++
-CFLAGS			=	-I $(INC_DIR) -Wall -Werror -Wextra -std=c++98
+CFLAGS			=	-I $(INC_DIR) -Wall -Werror -Wextra -fsanitize=address -g3 #-std=c++98
 
 SRCS			=	$(SRC_DIR)/webserver.cpp	\
 					$(SRC_DIR)/Config.cpp		\
 					$(SRC_DIR)/Server.cpp		\
 					$(SRC_DIR)/utils.cpp		\
 					$(SRC_DIR)/Request.cpp		\
+					$(SRC_DIR)/Response.cpp		\
 					$(SRC_DIR)/utils_config.cpp	\
 
 OBJS			=	$(SRCS:.cpp=.o)

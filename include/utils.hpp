@@ -2,8 +2,10 @@
 # define UTILS_HPP
 
 # include <iostream>
+# include <map>
 
-int	printMessage(std::string msg);
-int	printError(std::string error);
+char	**getCharMap(std::map<std::string, std::string> map);
+int		printMessage(std::string msg);
+int		printError(std::string error);
 
 #endif

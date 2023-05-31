@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 
 #include "Config.hpp"
+#include "Response.hpp"
 
 class Server
 {
@@ -11,8 +12,6 @@ private:
 	struct sockaddr_in	_socketAddress;
 	unsigned int		_socketAddress_len;
 	std::string			_ip_address;
-	//long				_incomingMessage;
-	//int					_new_socket;
 	int					_socket;
 	int					_port;
 	std::string			_serverResponse;
