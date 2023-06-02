@@ -113,10 +113,10 @@ int	Server::acceptConnection(void)
 
 int	Server::handleConnection(int client_socket)
 {
-	char	buffer[BUFFER_SIZE];
+	char	buffer[config.client_max_body_size];
 	
-	bzero(buffer, BUFFER_SIZE);
-	if (read(client_socket, buffer, BUFFER_SIZE) < 0)
+	bzero(buffer, config.client_max_body_size);
+	if (read(client_socket, buffer, config.client_max_body_size) < 0)
 	{
 		throw serverException("Cannot read request");
 		return (1);
@@ -124,8 +124,10 @@ int	Server::handleConnection(int client_socket)
 
 	Request request(buffer);
 	Response response(request);
+
 	response.generateResponse();
 	_serverResponse = response._fullResponse;
+
 	sendResponse(client_socket);
 	close(client_socket);
 	printMessage("Closing connection");

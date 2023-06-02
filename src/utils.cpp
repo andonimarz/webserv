@@ -1,6 +1,8 @@
-#include "utils.hpp"
-
 #include <cstring>
+#include <unistd.h>
+
+#include "utils.hpp"
+#include "web_server.hpp"
 
 int	printMessage(std::string msg)
 {
@@ -30,4 +32,20 @@ char	**getCharMap(std::map<std::string, std::string> map)
 	}
 	values[i] = NULL;
 	return (values);
+}
+
+std::string	readFileDescriptor(int fd)
+{
+	std::stringstream	ss;
+    char				buffer[BUFFER_SIZE];
+
+    while (1)
+	{
+        int bytesRead = read(fd, buffer, BUFFER_SIZE);
+        if (bytesRead <= 0)
+            break ;
+        ss.write(buffer, bytesRead);
+    }
+
+    return (ss.str());
 }

@@ -32,7 +32,7 @@ int	Response::generateResponse(void)
 			route_exist = true;
 			break ;
 		}
-		if (config.location[i].path != "/")
+		if (_request.getMethod() != "GET" || config.location[i].path != "/")
 			continue ;
 		std::ifstream file(config.location[i].root + _request.getRoute());
 		if (file.is_open() != 0)
@@ -41,8 +41,10 @@ int	Response::generateResponse(void)
 			route_exist = true;
 			break ;
 		}
-	}	
-	
+	}
+
+	// std::cout << "method" << _request.getMethod() << std::endl;
+
 	if (route_exist == false || i >= (int)config.location.size())
 		setErrorPage(404);
 	if (_errorPage == 0)
@@ -56,12 +58,13 @@ int	Response::generateResponse(void)
 int	Response::methodBuild(int location_index)
 {
 	_fullPath = config.location[location_index].root; // /www/./index.html
+	std::cout << location_index << "root" << config.location[location_index].root <<std::endl;
 	if (_request.getMethod() == "GET" && checkMethodRequest(location_index, GET) == 0)
 	{
 		if (_request.getRoute() == config.location[location_index].path)
 			_fullPath += "/" + config.location[location_index].index;
 		else
-			_fullPath += "/" + _request.getRoute();
+			_fullPath += "/." + _request.getRoute();
 		std::ifstream file(_fullPath);
 		if (file.is_open() == 0)
 			return (setErrorPage(404));
@@ -69,7 +72,8 @@ int	Response::methodBuild(int location_index)
 	}
 	else if (_request.getMethod() == "POST" && checkMethodRequest(location_index, POST) == 0)
 	{
-		_fullPath += "/" + _request._fileName;
+		_fullPath += config.location[location_index].upload_path + "/" + _request._fileName;
+		std::cout << "entra: " << _fullPath << std::endl; 
 		std::ifstream file(_fullPath);
 		if (file.is_open())
 		{
@@ -147,10 +151,7 @@ int	Response::executeCGI(void)
 		waitpid(pid, NULL, 0);
 		int fd_response = dup(fd[0]);
 		close(fd[0]);
-		char buffer[BUFFER_SIZE];	
-		bzero(buffer, BUFFER_SIZE);
-		read(fd_response, buffer, BUFFER_SIZE);
-		_fullResponse = std::string(buffer);
+		_fullResponse = readFileDescriptor(fd_response);
 	}
 	return (0);
 }

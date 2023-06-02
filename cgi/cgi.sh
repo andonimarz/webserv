@@ -11,24 +11,15 @@ then
     echo "$content"
 fi
 
-if [ "$REQUEST_METHOD" == "POST" ]
-then
-	echo "Content-type: text/html"
-	echo "Status: 200 OK"
-	echo ""
-fi
-
 # Ya esta comprobado que el archivo no existe
 if [ "$REQUEST_METHOD" == "POST" ]
 then
-	echo "Content-type: text/html"
-	echo "Status: 200 OK"
+	echo "HTTP/1.1 200 OK"
 	echo ""
 fi
 
 if [ "$REQUEST_METHOD" == "DELETE" ]
 then
-	echo "Content-type: text/html"
-	echo "Status: 200 OK"
+	echo "HTTP/1.1 200 OK"
 	echo ""
 fi

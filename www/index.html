@@ -5,18 +5,39 @@
 </head>
 <body>
     <h1>Formulario de Solicitud POST, DELETE y GET</h1>
-    <form action="http://localhost:8080/upload" method="POST" enctype="multipart/form-data">
+    <form action="http://localhost:8080/uploads" method="POST" enctype="multipart/form-data">
         <label for="file">Selecciona un archivo:</label>
         <input type="file" id="file" name="archivo" required><br><br>
         <input type="submit" value="Enviar">
     </form>
-
-    <form action="http://localhost:8080" method="DELETE">
-        <input type="submit" value="Eliminar">
-    </form>
+    
+  <form id="deleteForm">
+    <label for="filename">Ingrese el valor:</label>
+    <input type="text" id="filename" name="filename" required>
+    <button type="submit">Eliminar</button>
+  </form>
 
     <form action="http://localhost:8080" method="GET">
         <input type="submit" value="Obtener">
     </form>
+
+    <script>
+        document.getElementById('deleteForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          var filename = document.getElementById('filename').value;
+          var url = 'http://localhost:8080/uploads' + "/" + filename;
+    
+          var xhr = new XMLHttpRequest();
+          xhr.open('DELETE', url, true);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+              alert('Eliminado exitosamente.');
+            } else {
+              alert('Error al eliminar.');
+            }
+          };
+          xhr.send();
+        });
+      </script>
 </body>
 </html>
