@@ -5,7 +5,7 @@ INC_DIR			=	include
 
 RM				=	rm -rf
 CC				=	c++
-CFLAGS			=	-I $(INC_DIR) -Wall -Werror -Wextra -fsanitize=address -g3 #-std=c++98
+CFLAGS			=	-I $(INC_DIR) -Wall -Werror -Wextra  -g3 -fsanitize=address #-std=c++98
 
 SRCS			=	$(SRC_DIR)/webserver.cpp	\
 					$(SRC_DIR)/Config.cpp		\

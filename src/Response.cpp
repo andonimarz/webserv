@@ -11,6 +11,8 @@
 Response::Response(Request const &request) : _request(request)
 {
 	_fullPath = "";
+	_absoluteRoute = "";
+	_route = "";
 	_errorPage = 0;
 	return ;
 }
@@ -22,12 +24,13 @@ Response::~Response()
 
 int	Response::generateResponse(void)
 {
-	bool	route_exist = false;
-	int 	i;
+	bool		route_exist = false;
+	int 		i;
 
+	getRoutes();
 	for (i = 0; i < (int)config.location.size() && route_exist == false; i++)
 	{
-		if (_request.getRoute() == config.location[i].path)
+		if (_absoluteRoute == config.location[i].path)
 		{
 			route_exist = true;
 			break ;
@@ -39,12 +42,14 @@ int	Response::generateResponse(void)
 		{
 			file.close();
 			route_exist = true;
+			this->_route = _request.getRoute();
 			break ;
 		}
 	}
 
 	// std::cout << "method" << _request.getMethod() << std::endl;
 
+	std::cout << "i: " << i << std::endl;
 	if (route_exist == false || i >= (int)config.location.size())
 		setErrorPage(404);
 	if (_errorPage == 0)
@@ -55,16 +60,29 @@ int	Response::generateResponse(void)
 	return (0);
 }
 
+// "/uploads/index.html" -> "/uploads" "/index.html"
+int	Response::getRoutes(void)
+{
+	size_t i = this->_request.getRoute().find('/', 1);
+	if (i != std::string::npos)
+	{
+		this->_absoluteRoute = this->_request.getRoute().substr(0, i);
+		this->_route = this->_request.getRoute().substr(i, this->_request.getRoute().size());
+	}
+	else
+		this->_absoluteRoute = this->_request.getRoute();
+	return (0);
+}
+
 int	Response::methodBuild(int location_index)
 {
-	_fullPath = config.location[location_index].root; // /www/./index.html
-	std::cout << location_index << "root" << config.location[location_index].root <<std::endl;
+	_fullPath = config.location[location_index].root;
 	if (_request.getMethod() == "GET" && checkMethodRequest(location_index, GET) == 0)
 	{
 		if (_request.getRoute() == config.location[location_index].path)
 			_fullPath += "/" + config.location[location_index].index;
 		else
-			_fullPath += "/." + _request.getRoute();
+			_fullPath += "/." + _route;
 		std::ifstream file(_fullPath);
 		if (file.is_open() == 0)
 			return (setErrorPage(404));
@@ -73,7 +91,6 @@ int	Response::methodBuild(int location_index)
 	else if (_request.getMethod() == "POST" && checkMethodRequest(location_index, POST) == 0)
 	{
 		_fullPath += config.location[location_index].upload_path + "/" + _request._fileName;
-		std::cout << "entra: " << _fullPath << std::endl; 
 		std::ifstream file(_fullPath);
 		if (file.is_open())
 		{
@@ -92,12 +109,12 @@ int	Response::methodBuild(int location_index)
 	}
 	else if (_request.getMethod() == "DELETE" && checkMethodRequest(location_index, DELETE) == 0)
 	{
+		_fullPath += config.location[location_index].upload_path + _route;
 		std::ifstream file(_fullPath);
 		if (file.is_open() == 0)
 			return (setErrorPage(404));
 		file.close();
-		if (!std::remove(_fullPath.c_str()))
-			return (setErrorPage(500));
+		config.exportEnv("REQUEST_ROUTE", _fullPath);
 	}
 	else
 		setErrorPage(403);
@@ -121,8 +138,10 @@ int	Response::setErrorPage(int error)
 	_errorPage = error;
 	for (i = 0; i < 3; i++)
 		if (config.error_page[i].n_error == error)
+		{
 			break ;
-	_fullPath = config.error_page[i].path;	
+			_fullPath = config.error_page[i].path;	
+		}
 	return (0);
 }
 

@@ -20,6 +20,7 @@ fi
 
 if [ "$REQUEST_METHOD" == "DELETE" ]
 then
+	rm -rf "$REQUEST_ROUTE"
 	echo "HTTP/1.1 200 OK"
 	echo ""
 fi

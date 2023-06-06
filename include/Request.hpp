@@ -22,6 +22,8 @@ class Request
 		std::string getProtocol(void) const;
 		std::string getHost(void) const;
 		std::string getConnection(void) const;
+		std::string getFilename(void) const;
+		std::string getFileContent(void) const;
 		void getInfo(std::string const &str);
 		std::string _fileName; //POST
 		std::string _fileContent; //POST

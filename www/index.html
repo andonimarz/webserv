@@ -29,13 +29,13 @@
     
           var xhr = new XMLHttpRequest();
           xhr.open('DELETE', url, true);
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              alert('Eliminado exitosamente.');
-            } else {
-              alert('Error al eliminar.');
-            }
-          };
+          // xhr.onreadystatechange = function() {
+          //   if (xhr.readyState === 4 && xhr.status === 200) {
+          //     alert('Eliminado exitosamente.');
+          //   } else {
+          //     alert('Error al eliminar.');
+          //   }
+          // };
           xhr.send();
         });
       </script>

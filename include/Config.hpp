@@ -57,10 +57,10 @@ class Config
 		void printEnv(void) const;
 		void exportEnv(const std::string &key, const std::string &value);
 		void fillFields(const std::string &src);
+		void printConf(void) const;
 
 	private:
 		std::map<std::string, std::string> environment;
-		std::vector<t_location> locations;
 };
 
 std::vector<std::string> extractServerBlocks(const std::string &filePath);

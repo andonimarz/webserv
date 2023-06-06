@@ -16,44 +16,44 @@ Request::Request(std::string const &str)
     getInfo(str);
 }
 
-Request::~Request()
-{
+Request::~Request() {
     //std::cout << "[PRUEBAS_ANDONI] Destroying request" << std::endl;
 }
 
-void Request::setFullRequest(std::string const &str)
-{
+void Request::setFullRequest(std::string const &str) {
     this->_full_request = str;
 }
 
-std::string Request::getFullRequest(void) const
-{
+std::string Request::getFullRequest(void) const {
     return this->_full_request;
 }
 
-std::string Request::getMethod(void) const
-{
+std::string Request::getMethod(void) const {
     return this->_method;
 }
 
-std::string Request::getRoute(void) const
-{
+std::string Request::getRoute(void) const {
     return this->_route;
 }
 
-std::string Request::getProtocol(void) const
-{
+std::string Request::getProtocol(void) const {
     return this->_protocol;
 }
 
-std::string Request::getHost(void) const
-{
+std::string Request::getHost(void) const {
     return this->_host;
 }
 
-std::string Request::getConnection(void) const
-{
+std::string Request::getConnection(void) const {
     return this->_connection;
+}
+
+std::string Request::getFilename(void) const {
+    return this->_fileName;
+}
+
+std::string Request::getFileContent(void) const {
+    return this->_fileContent;
 }
 
 void Request::getInfo(std::string const &str)
@@ -100,18 +100,13 @@ void Request::getInfo(std::string const &str)
                 // Saving filename
                 std::string st = line.substr(pos + 9);
                 st.erase(std::remove(st.begin(), st.end(), '\"'), st.end());
+                st.erase(std::remove(st.begin(), st.end(), '\r'), st.end());
                 this->_fileName = st;
                 // Saving filecontent
-                std::string::size_type bodyStart = str.find(lines[i + 1]) + lines[i + 1].length();
+                std::string::size_type bodyStart = str.find(lines[i + 1]) + lines[i + 1].length() + 3;
                 std::string::size_type bodyEnd = str.rfind(lines[lines.size() - 1]);
-                this->_fileContent = str.substr(bodyStart + 2, bodyEnd - bodyStart);
-                std::cout << "===========================================\n";
-                // std::cout << "-> boundary: " << this->_boundary << std::endl;
-                // std::cout << "-> bodyStart: " << bodyStart << std::endl;
-                // std::cout << "-> bodyEnd: " << bodyEnd << std::endl;
-                std::cout << "-> FILENAME: " << this->_fileName << std::endl;
-                std::cout << "-> FILECONTENT: " << this->_fileContent;
-                std::cout << "===========================================\n";
+                this->_fileContent = str.substr(bodyStart, bodyEnd - bodyStart);
+                std::cout << *this << std::endl;
             }
         }
     }
@@ -123,6 +118,8 @@ std::ostream & operator<<(std::ostream &ost, const Request &src)
         << "-> ROUTE: " << src.getRoute() << std::endl \
         << "-> PROTOCOL: " << src.getProtocol() << std::endl \
         << "-> CONNECTION: " << src.getConnection() << std::endl \
-        << "-> HOST: " << src.getHost() << std::endl;
+        << "-> HOST: " << src.getHost() << std::endl \
+        << "-> FILENAME: " << src.getFilename() << std::endl \
+        << "-> FILECONTENT: " << src.getFileContent() << std::endl;
     return ost;
 }
