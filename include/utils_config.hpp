@@ -9,5 +9,6 @@
 
 std::vector<std::string> setBody(std::string &path);
 std::vector<std::string> extractServerBlocks(const std::string &configContent);
+bool isValidIPAddress(const std::string &ipAddress);
 
 #endif

@@ -34,7 +34,7 @@ int	main(int argc, char **argv, char **env)
 			{
 				const std::string &element = *it;
 				//std::cout << "Element: " << element << std::endl;
-				Config tmp("Temporal config");
+				Config tmp("");
 				tmp.setEnv(env);
 				tmp.fillFields(element);
 				tmp.printConf();

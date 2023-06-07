@@ -19,10 +19,12 @@ parseo del request
     Para las request que no sea POST puedes dejar esos campos vacios ("")"
 
 parseo del config
-- cualquier numero de server{}
-- comprobando las rutas
-- guarda el environment
-- export para el environment
+- (done)cualquier numero de server{}
+- (done)guarda el environment
+- (done)export para el environment
+- comprobando las rutas (solo las de error. faltan las de location etc.)
+- host: bien de listen ip:port o de server_name
+- 
 
 select
 - loops del select para trabajar con distintos fd

@@ -73,3 +73,28 @@ std::vector<std::string> extractServerBlocks(const std::string &configContent)
     }
     return serverBlocks;
 }
+
+bool isValidIPAddress(const std::string &ipAddress)
+{
+    std::string segment;
+    std::istringstream iss(ipAddress);
+    int numSegments = 0;
+
+    while (std::getline(iss, segment, '.'))
+    {
+        if (numSegments >= 4) {
+            return false;
+        }
+        
+        int num = 0;
+        std::istringstream segmentIss(segment);
+        if (!(segmentIss >> num) || num < 0 || num > 255)
+        {
+            return false;
+        }
+        
+        numSegments++;
+    }
+    
+    return numSegments == 4;
+}

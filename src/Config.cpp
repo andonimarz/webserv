@@ -43,7 +43,7 @@ Config::Config(std::string msg)
 	std::cout << msg << std::endl;
 	this->port = 0;
 	//Sobreescribir host en fillFields
-	this->host = "0.0.0.0";
+	this->host = "";
 	this->client_max_body_size = 0;
 }
 
@@ -127,9 +127,25 @@ void Config::fillFields(const std::string &src)
 		// Agregar un comentario para cada palabra clave encontrada
 		if (words[0] == "listen")
 		{
-			std::istringstream iss(words[1]);
+			std::istringstream iss;
+			// minitest
+			if (words.size() != 2)
+				throw std::runtime_error("Error: invalid host");
+			size_t pos = words[1].find(":");
+			if( pos == std::string::npos)
+				iss.str(words[1]);
+			else
+			{
+				std::string ipAddress = words[1].substr(0, pos);
+				if (isValidIPAddress(ipAddress))
+					this->host = ipAddress;
+				else
+					throw std::runtime_error("Error: bad ip address");
+				iss.str(words[1].substr(pos + 1));
+			}
 			int result;
-			iss >> result;
+			if (!(iss >> result))
+				throw std::runtime_error("Error: bad port");;
 			this->port = result;
 		}
 		else if (words[0] == "server_name")
