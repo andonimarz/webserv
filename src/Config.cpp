@@ -4,6 +4,10 @@
 Config::Config()
 {
 	{
+		this->port = 0;
+		//Sobreescribir host en fillFields
+		this->host = "0.0.0.0";
+		this->client_max_body_size = 0;
 		/* t_error_page page1;
 		t_error_page page2;
 		t_error_page page3;
@@ -181,15 +185,21 @@ void Config::fillFields(const std::string &src)
 					if (words[1] == "false" || words[1] == "FALSE")
 						this->location[locationIndex].upload_enable = 0;
 				}
-
 				if (lines[i].find("}") != std::string::npos)
 					inLocation = 0;
 			}
 		}
 		else if (words[0] == "error_page")
 		{
+			// minitest
 			if (words.size() != 3)
 				throw std::runtime_error("Error: bad error page");
+			for (size_t i = 0; i < words[1].size(); i++)
+				if (!std::isdigit(words[1][i]))
+					throw std::runtime_error("Error: bad error number");
+			if (access(words[2].c_str(), F_OK) == -1)
+				throw std::runtime_error("Error: invalid error path");
+			// getting params
 			t_error_page tmp;
 			std::istringstream iss(words[1]);
 			int result;
@@ -197,6 +207,26 @@ void Config::fillFields(const std::string &src)
 			tmp.n_error = result;
 			tmp.path = words[2];
 			this->error_page.push_back(tmp);
+		}
+		else if (words[0] == "client_max_body_size")
+		{
+			// minitest
+			if (words.size() != 2)
+				throw std::runtime_error("Error: bad max body size param number");
+			if (words[1].empty())
+				throw std::runtime_error("Error: empty max body size number");
+			for (size_t i = 0; i < words[1].size(); i++)
+				if (!std::isdigit(words[1][i]) && !(i == words[1].size() - 1 && words[1][i] == 'K'))
+					throw std::runtime_error("Error: bad max body size params");
+			// getting the number
+			int multiplier = 1;
+			if (words[1].back() == 'K')
+			{
+				multiplier = 1000;
+				words[1].pop_back();
+			}
+			int num = std::stoi(words[1]);
+			this->client_max_body_size = multiplier * num;
 		}
 	}
 }
@@ -222,7 +252,7 @@ void Config::printConf(void) const
 		<< "-> upload_enable: " << this->location[i].upload_enable << std::endl \
 		<< "-> cgi_extension: " << this->location[i].cgi_extension << std::endl \
 		<< "-> cgi_path: " << this->location[i].cgi_path << std::endl \
-		<< "-> autoindex: " << this->location[i].root << std::endl;
+		<< "-> autoindex: " << this->location[i].autoindex << std::endl;
 	}
 	for (size_t i = 0; i < this->error_page.size(); i++)
 	{
@@ -230,4 +260,5 @@ void Config::printConf(void) const
 		std::cout << "-> path: " << this->error_page[i].path << std::endl;
 		std::cout << "-> n_error: " << this->error_page[i].n_error << std::endl;
 	}
+	std::cout << "=========================================" << std::endl;
 }

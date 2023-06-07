@@ -3,16 +3,22 @@
 std::vector<std::string> setBody(std::string &path)
 {
     std::vector<std::string>	conf_servers;
+    std::stringstream buffer;
+    std::string conf_body;
     std::ifstream file(path);
     if (!file)
         throw std::runtime_error("Error: File '" + path + "' not found.");
-    std::stringstream buffer;
     buffer << file.rdbuf();
-    // Expresión regular para buscar líneas que comienzan con "#"
-    std::regex commentRegex("#.*");
-    std::string conf_body;
-    // Eliminar los comentarios reemplazando las coincidencias con una cadena vacía
-    conf_body = std::regex_replace(buffer.str(), commentRegex, "");
+    // Removing comments
+    std::istringstream iss(buffer.str());
+    std::string line;
+    while (std::getline(iss, line)) {
+        std::size_t commentPos = line.find_first_of("#;");
+        if (commentPos != std::string::npos)
+            line.erase(commentPos);
+        conf_body += line + '\n';
+    }
+    // Get the server{} blocks from the body
     conf_servers = extractServerBlocks(conf_body);
     return conf_servers;
 }

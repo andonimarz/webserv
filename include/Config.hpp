@@ -8,8 +8,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <regex>
 #include <string>
+#include <unistd.h>
 
 // En esta clase se parsea y guardan todos los datos extraidos de un archivo de configuración
 class Config
@@ -54,9 +54,9 @@ class Config
 		std::string getBody(void) const;
 		const std::map<std::string, std::string> &getEnvironment() const;
     	void setEnv(char** env);
-		void printEnv(void) const;
 		void exportEnv(const std::string &key, const std::string &value);
 		void fillFields(const std::string &src);
+		void printEnv(void) const;
 		void printConf(void) const;
 
 	private:
