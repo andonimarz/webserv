@@ -47,6 +47,7 @@ class Config
 	public:
 		// Constructor
 		Config();
+		Config(std::string msg);
 		// Destructor
 		~Config();
 

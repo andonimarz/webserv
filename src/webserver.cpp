@@ -25,6 +25,7 @@ int	main(int argc, char **argv, char **env)
 	{
 		if (argc == 2)
 		{
+			std::cout << "Using your cfg file\n";
 			std::vector<Config> configs;
 			std::string str(argv[1]);
 			std::vector<std::string> servers = setBody(str);
@@ -33,23 +34,24 @@ int	main(int argc, char **argv, char **env)
 			{
 				const std::string &element = *it;
 				//std::cout << "Element: " << element << std::endl;
-				Config tmp;
+				Config tmp("Temporal config");
+				tmp.setEnv(env);
 				tmp.fillFields(element);
 				tmp.printConf();
 				configs.push_back(tmp);
 			}
-			// Config tmp;
-			// tmp.fillFields(servers[0]);
+			Server server(configs[0]);
+			server.startServer();
+			server.startListen();
+		} else {
+			Server server(config);
+			server.startServer();
+			server.startListen();
 		}
-		//Server server(config);
-		//server.startServer();
-		//server.startListen();
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-		
-	
 	return (0);
 }
