@@ -177,12 +177,6 @@ void Server::sendResponse(int client_socket)
 
 	bytesSent = write(client_socket, _serverResponse.c_str(), _serverResponse.size());
 
-	if (bytesSent == _serverResponse.size())
-	{
-		printMessage("------ Server Response sent to client ------\n\n");
-	}
-	else
-	{
+	if (bytesSent != _serverResponse.size())
 		printMessage("Error sending response to client");
-	}
 }

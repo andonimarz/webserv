@@ -28,6 +28,7 @@ int	Response::generateResponse(void)
 	int 		i;
 
 	getRoutes();
+
 	for (i = 0; i < (int)config.location.size() && route_exist == false; i++)
 	{
 		if (_absoluteRoute == config.location[i].path)
@@ -47,9 +48,6 @@ int	Response::generateResponse(void)
 		}
 	}
 
-	// std::cout << "method" << _request.getMethod() << std::endl;
-
-	std::cout << "i: " << i << std::endl;
 	if (route_exist == false || i >= (int)config.location.size())
 		setErrorPage(404);
 	if (_errorPage == 0)
@@ -139,8 +137,8 @@ int	Response::setErrorPage(int error)
 	for (i = 0; i < 3; i++)
 		if (config.error_page[i].n_error == error)
 		{
-			break ;
 			_fullPath = config.error_page[i].path;	
+			break ;
 		}
 	return (0);
 }

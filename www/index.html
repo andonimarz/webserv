@@ -1,43 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Formulario de Solicitud POST, DELETE y GET</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="style.css">
+	<title>Formulario de Solicitud POST, DELETE y GET</title>
 </head>
 <body>
-    <h1>Formulario de Solicitud POST, DELETE y GET</h1>
-    <form action="http://localhost:8080/uploads" method="POST" enctype="multipart/form-data">
-        <label for="file">Selecciona un archivo:</label>
-        <input type="file" id="file" name="archivo" required><br><br>
-        <input type="submit" value="Enviar">
-    </form>
-    
-  <form id="deleteForm">
-    <label for="filename">Ingrese el valor:</label>
-    <input type="text" id="filename" name="filename" required>
-    <button type="submit">Eliminar</button>
-  </form>
+	<section>
+		<article>
+			WEB SERVER by:
+		</article>
+		<article id="formsArticle">
+			<form action="http://localhost:8080/uploads" method="POST" enctype="multipart/form-data">
+				<h3>Sube tu archivo</h3>
+				<div class="input-wrapper">
+					<label for="file" class="custom-file-upload">Seleccionar archivo</label>
+					<input type="file" id="file" name="archivo" required>
+				</div>
+				<input type="submit" value="Enviar">
+			</form>
+			
+			<form id="myForm" action="http://localhost:8080" method="GET">
+				<label for="filename"><h3>Nombre página</h3></label>
+				<input type="text" id="filename" name="filename" required><br><br>
+				
+				<button type="button" onclick="obtenerArchivo()">Obtener</button>
+				<button type="button" onclick="borrarArchivo()">Borrar</button>
+			  </form>
 
-    <form action="http://localhost:8080" method="GET">
-        <input type="submit" value="Obtener">
-    </form>
+			<!-- <form action="http://localhost:8080" method="GET">
+				<input type="submit" value="Obtener">
+			</form> -->
+		</article>
+	</section>
 
-    <script>
-        document.getElementById('deleteForm').addEventListener('submit', function(event) {
-          event.preventDefault();
-          var filename = document.getElementById('filename').value;
-          var url = 'http://localhost:8080/uploads' + "/" + filename;
-    
-          var xhr = new XMLHttpRequest();
-          xhr.open('DELETE', url, true);
-          // xhr.onreadystatechange = function() {
-          //   if (xhr.readyState === 4 && xhr.status === 200) {
-          //     alert('Eliminado exitosamente.');
-          //   } else {
-          //     alert('Error al eliminar.');
-          //   }
-          // };
-          xhr.send();
-        });
-      </script>
+
+	<script>
+		function obtenerArchivo()
+		{
+			var filename = document.getElementById('filename').value;
+			var url = 'http://localhost:8080/' + filename;
+
+			window.location.href = url;
+		}
+	
+		function borrarArchivo()
+		{
+			var filename = document.getElementById('filename').value;
+			var url = 'http://localhost:8080/uploads/' + filename;
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('DELETE', url, true);
+
+			xhr.onreadystatechange = function()
+			{
+			if (xhr.readyState === 4 && xhr.status === 200)
+				alert('Eliminado exitosamente.');
+			else
+				alert('Error al eliminar.');
+			};
+			
+			xhr.send();
+		}
+	</script>
 </body>
 </html>
