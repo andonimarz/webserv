@@ -36,7 +36,7 @@ int	Response::generateResponse(void)
 			route_exist = true;
 			break ;
 		}
-		if (_request.getMethod() != "GET" || config.location[i].path != "/")
+		if (_request.getMethod() != "GET" || config.location[i].path != "/" || _route != "")
 			continue ;
 		std::ifstream file(config.location[i].root + _request.getRoute());
 		if (file.is_open() != 0)
@@ -53,7 +53,14 @@ int	Response::generateResponse(void)
 	if (_errorPage == 0)
 		methodBuild(i);
 	if (_errorPage == 0)
+	{
 		config.exportEnv("REQUEST_METHOD", _request.getMethod());
+		config.exportEnv("REQUEST_STATUS", "200");
+		config.exportEnv("CONFIG_HOST", config.host);
+		std::stringstream ss;
+    	ss << config.port;
+		config.exportEnv("CONFIG_PORT", ss.str());
+	}
 	executeCGI();
 	return (0);
 }
@@ -74,7 +81,7 @@ int	Response::getRoutes(void)
 
 int	Response::methodBuild(int location_index)
 {
-	_fullPath = config.location[location_index].root;
+	_fullPath = config.location[location_index].root + config.location[location_index].upload_path;
 	if (_request.getMethod() == "GET" && checkMethodRequest(location_index, GET) == 0)
 	{
 		if (_request.getRoute() == config.location[location_index].path)
@@ -82,13 +89,13 @@ int	Response::methodBuild(int location_index)
 		else
 			_fullPath += "/." + _route;
 		std::ifstream file(_fullPath);
-		if (file.is_open() == 0)
+		if (!file.is_open())
 			return (setErrorPage(404));
 		file.close();
 	}
 	else if (_request.getMethod() == "POST" && checkMethodRequest(location_index, POST) == 0)
 	{
-		_fullPath += config.location[location_index].upload_path + "/" + _request._fileName;
+		_fullPath += "/" + _request._fileName;
 		std::ifstream file(_fullPath);
 		if (file.is_open())
 		{
@@ -97,7 +104,7 @@ int	Response::methodBuild(int location_index)
 		}
 		std::ofstream new_file;
 		new_file.open(_fullPath, std::ios::out);
-		if (new_file)
+		if (new_file.is_open())
 		{
 			new_file << _request._fileContent;
 			new_file.close();
@@ -107,7 +114,7 @@ int	Response::methodBuild(int location_index)
 	}
 	else if (_request.getMethod() == "DELETE" && checkMethodRequest(location_index, DELETE) == 0)
 	{
-		_fullPath += config.location[location_index].upload_path + _route;
+		_fullPath += _route;
 		std::ifstream file(_fullPath);
 		if (file.is_open() == 0)
 			return (setErrorPage(404));
@@ -137,9 +144,13 @@ int	Response::setErrorPage(int error)
 	for (i = 0; i < 3; i++)
 		if (config.error_page[i].n_error == error)
 		{
-			_fullPath = config.error_page[i].path;	
+			_fullPath = config.error_page[i].path;
+			std::stringstream ss;
+			ss << error;
+			config.exportEnv("REQUEST_STATUS", ss.str());
 			break ;
 		}
+	
 	return (0);
 }
 

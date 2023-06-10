@@ -29,3 +29,6 @@ parseo del config
 select
 - loops del select para trabajar con distintos fd
 - cerrar el socket solo si lo pone en la request
+
+Chequear que el nº de location >= 1 y que al menos una tenga el path /
+index no va en location

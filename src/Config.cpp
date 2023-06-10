@@ -9,12 +9,12 @@ Config::Config()
 	t_location location1;
 	t_location location2;
 
-	page1.n_error = 404;
-	page1.path = "www/error/404.html";
-	page2.n_error = 405;
-	page2.path = "www/error/405.html";
-	page3.n_error = 406;
-	page3.path = "www/error/406.html";
+	page1.n_error = 403;
+	page1.path = "www/error/403.html";
+	page2.n_error = 404;
+	page2.path = "www/error/404.html";
+	page3.n_error = 500;
+	page3.path = "www/error/500.html";
 
 	location1.method.push_back(GET);
 	location1.path = "/";
@@ -23,12 +23,12 @@ Config::Config()
 
 	location2.method.push_back(POST);
 	location2.method.push_back(DELETE);
-	location2.path = "/uploads";
+	location2.path = "/upload";
 	location2.upload_enable = true;
 	location2.upload_path = "www/uploads";
 
 	this->port = 8080;
-	this->host = "0.0.0.0";
+	this->host = "127.0.0.1";
 	this->server_name.push_back("localhost");
 	this->client_max_body_size = 500000;
 	this->error_page.push_back(page1);

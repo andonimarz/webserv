@@ -11,7 +11,7 @@
 			WEB SERVER by:
 		</article>
 		<article id="formsArticle">
-			<form action="http://localhost:8080/uploads" method="POST" enctype="multipart/form-data">
+			<form action="http://host_here:port_here/upload" method="POST" enctype="multipart/form-data">
 				<h3>Sube tu archivo</h3>
 				<div class="input-wrapper">
 					<label for="file" class="custom-file-upload">Seleccionar archivo</label>
@@ -20,26 +20,32 @@
 				<input type="submit" value="Enviar">
 			</form>
 			
-			<form id="myForm" action="http://localhost:8080" method="GET">
+			<form id="myForm" onkeydown="return handleEnter(event)">
 				<label for="filename"><h3>Nombre página</h3></label>
 				<input type="text" id="filename" name="filename" required><br><br>
 				
 				<button type="button" onclick="obtenerArchivo()">Obtener</button>
 				<button type="button" onclick="borrarArchivo()">Borrar</button>
 			  </form>
-
-			<!-- <form action="http://localhost:8080" method="GET">
-				<input type="submit" value="Obtener">
-			</form> -->
 		</article>
 	</section>
 
 
 	<script>
+		function handleEnter(event) {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+
+				if (document.activeElement === document.getElementById('myForm')) {
+					obtenerArchivo();
+				}
+			}
+		}
+
 		function obtenerArchivo()
 		{
 			var filename = document.getElementById('filename').value;
-			var url = 'http://localhost:8080/' + filename;
+			var url = 'http://host_here:port_here/' + filename;
 
 			window.location.href = url;
 		}
@@ -47,17 +53,18 @@
 		function borrarArchivo()
 		{
 			var filename = document.getElementById('filename').value;
-			var url = 'http://localhost:8080/uploads/' + filename;
+			var url = 'http://host_here:port_here/upload/' + filename;
+			deleteFix = 0;
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('DELETE', url, true);
 
 			xhr.onreadystatechange = function()
 			{
-			if (xhr.readyState === 4 && xhr.status === 200)
-				alert('Eliminado exitosamente.');
-			else
-				alert('Error al eliminar.');
+				if (xhr.readyState === 4 && xhr.status === 200)
+					alert('Eliminado exitosamente.');
+				else if (xhr.readyState === 3)
+					alert('Error al eliminar.');
 			};
 			
 			xhr.send();
