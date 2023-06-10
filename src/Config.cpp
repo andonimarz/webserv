@@ -266,7 +266,7 @@ void Config::printConf(void) const
 			std::cout << "-> method[" << j << "]: "<< this->location[i].method[j] << std::endl;
 		std::cout << "-> path: " << this->location[i].path << std::endl \
 		<< "-> root: " << this->location[i].root << std::endl \
-		<< "-> index: " << this->location[i].root << std::endl \
+		<< "-> index: " << this->location[i].index << std::endl \
 		<< "-> upload_path: " << this->location[i].upload_path << std::endl \
 		<< "-> upload_enable: " << this->location[i].upload_enable << std::endl \
 		<< "-> cgi_extension: " << this->location[i].cgi_extension << std::endl \

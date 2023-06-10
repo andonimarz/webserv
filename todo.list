@@ -23,12 +23,15 @@ parseo del config
 - (done)guarda el environment
 - (done)export para el environment
 - comprobando las rutas (solo las de error. faltan las de location etc.)
-- host: bien de listen ip:port o de server_name
-- 
+- (done)host: bien de listen ip:port o de server_name
+- Chequear que el nº de location >= 1 y que al menos una tenga el path /
+index no va en location
+- No pueden llegar un index y upload path vacios. tiene que haber minimo.
+tampoco pueden llegar los dos con algo
+- No puede haber un location sin metodo
+- localhost tiene que traducirse a 127.0.0.1
+- puertos: 1024 al puerto 49151 que es el rango de puertos registrados
 
 select
 - loops del select para trabajar con distintos fd
 - cerrar el socket solo si lo pone en la request
-
-Chequear que el nº de location >= 1 y que al menos una tenga el path /
-index no va en location
