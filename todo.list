@@ -24,14 +24,14 @@ parseo del config
 - (done)export para el environment
 - comprobando las rutas (solo las de error. faltan las de location etc.)
 - (done)host: bien de listen ip:port o de server_name
-- Chequear que el nº de location >= 1 y que al menos una tenga el path /
-index no va en location
-- No pueden llegar un index y upload path vacios. tiene que haber minimo.
+- (done) si el arg del conf file es un directorio da segfault
+- (done) Chequear que el nº de location >= 1 y que al menos una tenga el path /
+- (done) No pueden llegar un index y upload path vacios. tiene que haber minimo.
 tampoco pueden llegar los dos con algo
-- No puede haber un location sin metodo
-- localhost tiene que traducirse a 127.0.0.1
-- puertos: 1024 al puerto 49151 que es el rango de puertos registrados
-- si tenemos mas de un server que no se repita el puerto y el hostname
+- (done) No puede haber un location sin metodo
+- (done) localhost tiene que traducirse a 127.0.0.1
+- (done) puertos: 1024 al puerto 49151 que es el rango de puertos registrados
+- (done) si tenemos mas de un server que no se repita el puerto y el hostname
 
 select
 - loops del select para trabajar con distintos fd
