@@ -18,7 +18,7 @@ private:
 
 public:
 	// ===== Constructor =====
-	Server(Config config);
+	Server(Config conf);
 
 	// ===== Destructor =====
 	~Server();

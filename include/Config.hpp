@@ -49,8 +49,11 @@ class Config
 		// Constructor
 		Config();
 		Config(std::string msg);
+		Config(const Config &src);
 		// Destructor
 		~Config();
+
+		Config	&operator=(const Config &src);
 
 		//void setBody(std::string &server);
 		std::string getBody(void) const;

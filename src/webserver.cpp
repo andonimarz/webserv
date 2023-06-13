@@ -40,6 +40,9 @@ int	main(int argc, char **argv, char **env)
 				tmp.printConf();
 				configs.push_back(tmp);
 			}
+			// De momento solo usamos el primer server
+			if (configs.empty())
+				throw std::runtime_error("Error: invalid config file path.");
 			Server server(configs[0]);
 			server.startServer();
 			server.startListen();

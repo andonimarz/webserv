@@ -10,15 +10,15 @@
 #include "web_server.hpp"
 
 // ===== Constructor =====
-Server::Server(Config config)
+Server::Server(Config conf)
 {
+	config = conf;
 	this->_ip_address = config.host;
 	this->_port = config.port;
 	this->_socketAddress_len = sizeof(_socketAddress);
 	this->_socketAddress.sin_family = AF_INET;
 	this->_socketAddress.sin_port = htons(this->_port);
 	this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ip_address.c_str());
-	// this->_serverResponse = this->buildResponse();
 }
 
 // ===== Destructor =====

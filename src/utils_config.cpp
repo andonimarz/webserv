@@ -6,7 +6,7 @@ std::vector<std::string> setBody(std::string &path)
     std::stringstream buffer;
     std::string conf_body;
     std::ifstream file(path);
-    if (!file)
+    if (!file.good())
         throw std::runtime_error("Error: File '" + path + "' not found.");
     buffer << file.rdbuf();
     // Removing comments

@@ -36,6 +36,35 @@ article
 	justify-content: center;	
 }
 
+#members h1
+{
+	font-size: 200%;
+}
+
+#members ul
+{
+	width: auto;
+	list-style: none;
+	text-align: center;
+	margin: 2%;
+	font-size: 120%;
+	border-radius: 50%;
+	background-color: #4CAF50;
+	padding: 1.5%;
+	transition-duration: 1s;
+}
+
+#members ul:hover
+{
+	transition-duration: 1s;
+	padding: 5%;
+}
+
+#members li
+{
+	margin: 5% 0;
+}
+
 #formsArticle
 {
 	background-color: #EFEFEF;

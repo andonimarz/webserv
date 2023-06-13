@@ -38,6 +38,52 @@ Config::Config()
 	this->location.push_back(location2);
 }
 
+// Operator
+Config	&Config::operator=(const Config &src)
+{
+	// Limpiar el contenido de this
+
+	this->host = src.host;
+	this->port = src.port;
+	this->client_max_body_size = src.client_max_body_size;
+
+	{
+		// server_name vector
+		std::vector<std::string>::iterator it = this->server_name.begin();
+		while (it != this->server_name.end())
+			it = this->server_name.erase(it);
+		this->server_name.clear();
+		for (size_t i = 0; i < src.server_name.size(); i++)
+			this->server_name.push_back(src.server_name[i]);
+	}
+	{
+		// location vector
+		std::cout << "locationSize before: " << this->location.size() << std::endl;
+		std::vector<t_location>::iterator it = this->location.begin();
+		while (it != this->location.end())
+			it = this->location.erase(it);
+		this->location.clear();
+		std::cout << "locationSize after: " << this->location.size() << std::endl;
+		for (size_t i = 0; i < src.location.size(); i++)
+			this->location.push_back(src.location[i]);
+	}
+	{
+		// error_page vector
+		std::vector<t_error_page>::iterator it = this->error_page.begin();
+		while (it != this->error_page.end())
+			it = this->error_page.erase(it);
+		this->error_page.clear();
+		for (size_t i = 0; i < src.error_page.size(); i++)
+			this->error_page.push_back(src.error_page[i]);
+	}
+	return (*this);
+}
+
+Config::Config(const Config &src)
+{
+	*this = src;
+}
+
 Config::Config(std::string msg)
 {
 	std::cout << msg << std::endl;
