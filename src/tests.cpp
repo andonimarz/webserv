@@ -9,7 +9,6 @@ void testConfigs(std::vector<Config> configs)
 		throw std::runtime_error("Error: invalid config file path.");
     for (size_t i = 0; i < configs.size(); i++)
     {
-        std::cout << "Empezamos\n";
         // Minitests for location{}
         testLocation(configs[i].location);
         // Checks if port is in registered ports range
@@ -26,8 +25,6 @@ void testConfigs(std::vector<Config> configs)
             hosts.push_back(configs[i].server_name[j]);
         }
     }
-    //for(size_t i = 0; i < hosts.size(); i++)
-    //    std::cout << "!!!!!!!!! " << hosts[i] << std::endl;
 }
 
 void testLocation(std::vector<Config::t_location> locations)
@@ -63,7 +60,6 @@ void testLocation(std::vector<Config::t_location> locations)
     }
     if (root != 1)
 		throw std::runtime_error("Error: you need one and only one root '/' location.");
-    std::cout << "Locations / = " << root << std::endl;
 }
 
 std::string joinPaths(std::string root, std::string path)

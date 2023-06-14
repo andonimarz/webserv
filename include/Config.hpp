@@ -61,6 +61,12 @@ class Config
     	void setEnv(char** env);
 		void exportEnv(const std::string &key, const std::string &value);
 		void fillFields(const std::string &src);
+		std::vector<std::string> fillWords(std::string line);
+		void saveListen(const std::vector<std::string> &words);
+		void saveServerName(std::vector<std::string> &words);
+		void saveErrorPage(std::vector<std::string> &words);
+		void saveMaxSize(std::vector<std::string> &words);
+		void saveLocation(std::vector<std::string> &words, std::size_t &locationIndex);
 		void printEnv(void) const;
 		void printConf(void) const;
 

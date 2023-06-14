@@ -36,3 +36,7 @@ tampoco pueden llegar los dos con algo
 select
 - loops del select para trabajar con distintos fd
 - cerrar el socket solo si lo pone en la request
+
+
+CUANTOS SERVER NAMES VAMOS A ADMITIR?
+DESDE SERVER NAME CAMBIAMOS EL HOST?
