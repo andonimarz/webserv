@@ -12,9 +12,10 @@ public:
 	std::string	_absoluteRoute; // /uploads
 	std::string	_route;			// /eliminame.txt
 	int			_errorPage;
+	Config		_config;
 
 public:
-	Response(Request const &request);
+	Response(const Config conf, Request const &request);
 	~Response();
 
 	int	generateResponse(void);

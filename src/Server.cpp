@@ -12,9 +12,9 @@
 // ===== Constructor =====
 Server::Server(Config conf)
 {
-	config = conf;
-	this->_ip_address = config.host;
-	this->_port = config.port;
+	this->_config = conf;
+	this->_ip_address = this->_config.host;
+	this->_port = this->_config.port;
 	this->_socketAddress_len = sizeof(_socketAddress);
 	this->_socketAddress.sin_family = AF_INET;
 	this->_socketAddress.sin_port = htons(this->_port);
@@ -42,17 +42,17 @@ int		Server::startServer(void)
 		throw serverException("Cannot connect socket to address");
 		return (1);
 	}
-	return (0);
-}
 
-int	Server::startListen(void)
-{
 	if (listen(this->_socket, 20) < 0)
 	{
 		throw serverException("Socket listen failed");
 		return (1);
 	}
+	return (0);
+}
 
+int	Server::startListen(void)
+{
 	printMessage("===== Listening =====");
 	printMessage("ADDRESS: " + std::string(inet_ntoa(this->_socketAddress.sin_addr)));
 	std::cout << "PORT: " << ntohs(this->_socketAddress.sin_port) << std::endl;
@@ -113,17 +113,17 @@ int	Server::acceptConnection(void)
 
 int	Server::handleConnection(int client_socket)
 {
-	char	buffer[config.client_max_body_size];
+	char	buffer[this->_config.client_max_body_size];
 	
-	bzero(buffer, config.client_max_body_size);
-	if (read(client_socket, buffer, config.client_max_body_size) < 0)
+	bzero(buffer, this->_config.client_max_body_size);
+	if (read(client_socket, buffer, this->_config.client_max_body_size) < 0)
 	{
 		throw serverException("Cannot read request");
 		return (1);
 	}
 
 	Request request(buffer);
-	Response response(request);
+	Response response(this->_config, request);
 
 	response.generateResponse();
 	_serverResponse = response._fullResponse;

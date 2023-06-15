@@ -15,6 +15,7 @@ private:
 	int					_socket;
 	int					_port;
 	std::string			_serverResponse;
+	Config				_config;
 
 public:
 	// ===== Constructor =====

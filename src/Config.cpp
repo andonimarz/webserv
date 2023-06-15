@@ -58,12 +58,10 @@ Config	&Config::operator=(const Config &src)
 	}
 	{
 		// location vector
-		std::cout << "locationSize before: " << this->location.size() << std::endl;
 		std::vector<t_location>::iterator it = this->location.begin();
 		while (it != this->location.end())
 			it = this->location.erase(it);
 		this->location.clear();
-		std::cout << "locationSize after: " << this->location.size() << std::endl;
 		for (size_t i = 0; i < src.location.size(); i++)
 			this->location.push_back(src.location[i]);
 	}
@@ -173,6 +171,7 @@ void Config::fillFields(const std::string &src)
 						throw std::runtime_error("Error: location {} not closed");
 				// Creamos un location y lo pusheamos al vector
 				t_location tmp;
+				initLocation(tmp);
 				tmp.path = words[1];
 				this->location.push_back(tmp);
 				locationIndex = location.size() - 1;
@@ -182,7 +181,11 @@ void Config::fillFields(const std::string &src)
 			{
 				saveLocation(words, locationIndex);
 				if (lines[i].find("}") != std::string::npos)
+				{
+					if (location[locationIndex].autoindex == true)
+						location[locationIndex].index = "index.html";
 					inLocation = 0;
+				}
 			}
 		}
 	}
@@ -251,6 +254,18 @@ void Config::saveErrorPage(std::vector<std::string> &words)
 	this->error_page.push_back(tmp);
 }
 
+void Config::initLocation(Config::t_location &src)
+{
+	src.path = "";
+    src.root = "";
+    src.index = "";
+    src.upload_path = "";
+    src.cgi_extension = "";
+    src.cgi_path = "";
+    src.autoindex = true;
+    src.upload_enable = false;
+}
+
 void Config::saveLocation(std::vector<std::string> &words, std::size_t &locationIndex)
 {
 	if (words[0] == "method")
@@ -264,6 +279,16 @@ void Config::saveLocation(std::vector<std::string> &words, std::size_t &location
 		else
 			throw std::runtime_error("Error: bad location method");
 	}
+	else if (words[0] == "autoindex")
+	{
+		if (words[1] == "on" || words[1] == "ON")
+			this->location[locationIndex].autoindex = true;
+		if (words[1] == "off" || words[1] == "OFF")
+		{
+			this->location[locationIndex].index = "";
+			this->location[locationIndex].autoindex = false;
+		}
+	}
 	else if (words[0] == "root")
 		this->location[locationIndex].root = words[1];
 	else if (words[0] == "index")
@@ -274,25 +299,18 @@ void Config::saveLocation(std::vector<std::string> &words, std::size_t &location
 		this->location[locationIndex].cgi_extension = words[1];
 	else if (words[0] == "cgi_path")
 		this->location[locationIndex].cgi_path = words[1];
-	else if (words[0] == "autoindex")
-	{
-		if (words[1] == "on" || words[1] == "ON")
-			this->location[locationIndex].autoindex = 1;
-		if (words[1] == "off" || words[1] == "OFF")
-			this->location[locationIndex].autoindex = 0;
-	}
 	else if (words[0] == "upload_enable")
 	{
-		if (words[1] == "true" || words[1] == "TRUE")
-			this->location[locationIndex].upload_enable = 1;
-		if (words[1] == "false" || words[1] == "FALSE")
-			this->location[locationIndex].upload_enable = 0;
+		if (words[1] == "on" || words[1] == "ON")
+			this->location[locationIndex].upload_enable = true;
+		if (words[1] == "off" || words[1] == "OFF")
+			this->location[locationIndex].upload_enable = false;
 	}
 }
 
 void Config::saveServerName(std::vector<std::string> &words)
 {
-	// Max 3 server names. POR REVISAR!
+	/* // Max 3 server names. POR REVISAR!
 	if (words.size() > 4)
 			throw std::runtime_error("Error: too many fields");
 	for (size_t i = 1; i < words.size(); i++)
@@ -302,7 +320,14 @@ void Config::saveServerName(std::vector<std::string> &words)
 		std::vector<std::string>::iterator it = std::find(server_name.begin(), server_name.end(), words[i]);
 		if (it == server_name.end() || it->size() != words[i].size())
 			this->server_name.push_back(words[i]);
-	}
+	} */
+	// Max 1 server name and must be localhost.
+	if (words.size() != 2)
+		throw std::runtime_error("Error: obligatory one server name per server.");
+	if (words[1] != "localhost" && words[1] != "127.0.0.1")
+		throw std::runtime_error("Error: only localhost or 127.0.0.1 allowed as server name.");
+	this->server_name.push_back("127.0.0.1");
+	this->host = "127.0.0.1";
 }
 
 void Config::saveListen(const std::vector<std::string> &words)
@@ -319,7 +344,10 @@ void Config::saveListen(const std::vector<std::string> &words)
 	{
 		// si hay dos puntos separamos el host del puerto y los guardamos
 		std::string ipAddress = words[1].substr(0, pos);
-		if (isValidIPAddress(ipAddress))
+		/* if (isValidIPAddress(ipAddress))
+			this->host = ipAddress;
+		 */
+		if (ipAddress == "127.0.0.1")
 			this->host = ipAddress;
 		else
 			throw std::runtime_error("Error: bad ip address");

@@ -43,6 +43,7 @@ int	main(int argc, char **argv, char **env)
 			}
 			// De momento solo usamos el primer server
 			testConfigs(configs);
+			//configs[0].printConf();
 			Server server(configs[0]);
 			server.startServer();
 			server.startListen();

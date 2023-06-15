@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <unistd.h>
+#include <algorithm>
 
 // En esta clase se parsea y guardan todos los datos extraidos de un archivo de configuración
 class Config
@@ -66,6 +67,7 @@ class Config
 		void saveServerName(std::vector<std::string> &words);
 		void saveErrorPage(std::vector<std::string> &words);
 		void saveMaxSize(std::vector<std::string> &words);
+		void initLocation(Config::t_location &src);
 		void saveLocation(std::vector<std::string> &words, std::size_t &locationIndex);
 		void printEnv(void) const;
 		void printConf(void) const;
