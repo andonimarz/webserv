@@ -16,11 +16,13 @@ Config::Config()
 	page3.n_error = 500;
 	page3.path = "www/error/500.html";
 
+	initLocation(location1);
 	location1.method.push_back(GET);
 	location1.path = "/";
 	location1.root = "www";
-	location1.index = "./index.html";
+	location1.index = "index.html";
 
+	initLocation(location2);
 	location2.method.push_back(POST);
 	location2.method.push_back(DELETE);
 	location2.path = "/upload";
@@ -292,7 +294,10 @@ void Config::saveLocation(std::vector<std::string> &words, std::size_t &location
 	else if (words[0] == "root")
 		this->location[locationIndex].root = words[1];
 	else if (words[0] == "index")
+	{
+		this->location[locationIndex].autoindex = false;
 		this->location[locationIndex].index = words[1];
+	}
 	else if (words[0] == "upload_path")
 		this->location[locationIndex].upload_path = words[1];
 	else if (words[0] == "cgi_extension")

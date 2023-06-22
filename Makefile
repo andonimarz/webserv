@@ -8,6 +8,7 @@ CC				=	c++
 CFLAGS			=	-I $(INC_DIR) -Wall -Werror -Wextra  -g3 -fsanitize=address #-std=c++98
 
 SRCS			=	$(SRC_DIR)/webserver.cpp	\
+					$(SRC_DIR)/Route.cpp		\
 					$(SRC_DIR)/Config.cpp		\
 					$(SRC_DIR)/Server.cpp		\
 					$(SRC_DIR)/utils.cpp		\

@@ -3,13 +3,12 @@
 
 #include "Config.hpp"
 #include "Server.hpp"
+#include "Route.hpp"
 #include "utils.hpp"
 #include "utils_config.hpp"
 #include "tests.hpp"
 
 #include "web_server.hpp"
-
-Config	config;
 
 int	main(int argc, char **argv, char **env)
 {
@@ -18,10 +17,8 @@ int	main(int argc, char **argv, char **env)
 		std::cout << "Error: bad args" << std::endl;
 		return 0;
 	}
-    // Config config;
+    Config config;
 	config.setEnv(env);
-	// config.exportEnv("REQUEST_METHOD", "GET");
-	// config.printEnv();
 	try
 	{
 		if (argc == 2)
@@ -38,19 +35,16 @@ int	main(int argc, char **argv, char **env)
 				Config tmp("");
 				tmp.setEnv(env);
 				tmp.fillFields(element);
-				tmp.printConf();
+				// tmp.printConf();
 				configs.push_back(tmp);
 			}
 			// De momento solo usamos el primer server
 			testConfigs(configs);
-			//configs[0].printConf();
-			Server server(configs[0]);
-			server.startServer();
-			server.startListen();
+			Route route(configs);
+			route.startListen();
 		} else {
-			Server server(config);
-			server.startServer();
-			server.startListen();
+			Route route(config);
+			route.startListen();
 		}
 	}
 	catch (std::exception &e)

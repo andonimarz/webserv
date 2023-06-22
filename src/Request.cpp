@@ -1,9 +1,8 @@
 #include "Request.hpp"
 
-Request::Request(std::string const &str)
+Request::Request(std::vector<char> buf)
 {
     //std::cout << "[PRUEBAS_ANDONI] Generating request" << std::endl;
-    this->_full_request = "";
     this->_method = "";
     this->_route = "";
     this->_protocol = "";
@@ -11,20 +10,23 @@ Request::Request(std::string const &str)
     this->_connection = "";
     this->_boundary = "";
     this->_fileName = "";
-    this->_fileContent = "";
-    setFullRequest(str);
-    getInfo(str);
+    this->_full_request = buf;
+    this->_contentLength = 0;
+    getInfo();
+    /* std::cout << "Request: " << std::endl;
+    for (size_t i = 0; i < buf.size(); i++)
+        std::cout << buf[i]; */
 }
 
 Request::~Request() {
     //std::cout << "[PRUEBAS_ANDONI] Destroying request" << std::endl;
 }
 
-void Request::setFullRequest(std::string const &str) {
-    this->_full_request = str;
+void Request::setFullRequest(const std::vector<char> &src) {
+    this->_full_request = src;
 }
 
-std::string Request::getFullRequest(void) const {
+std::vector<char> Request::getFullRequest(void) const {
     return this->_full_request;
 }
 
@@ -52,12 +54,13 @@ std::string Request::getFilename(void) const {
     return this->_fileName;
 }
 
-std::string Request::getFileContent(void) const {
+std::vector<char> Request::getFileContent(void) const {
     return this->_fileContent;
 }
 
-void Request::getInfo(std::string const &str)
+void Request::getInfo(void)
 {
+    std::string str(this->_full_request.begin(), this->_full_request.end());
     std::vector<std::string> lines;
     std::vector<std::string> words;
     std::stringstream ss(str);
@@ -90,10 +93,19 @@ void Request::getInfo(std::string const &str)
                 // Saving connection
                 if (firstWord == "Connection:")
                     this->_connection = line.substr(pos + 1);
+                if(firstWord == "Content-Length:")
+                {
+                    std::istringstream iss(line.substr(pos + 1));
+                    iss >> this->_contentLength;
+                    //std::cout << "-> Content-Length: " << this->_contentLength << std::endl;
+                }
             }
             pos = line.find("boundary=");
             if (pos != std::string::npos)
+            {
                 this->_boundary = line.substr(pos + 9);
+                //std::cout << "-> Boundary: " << this->_boundary << std::endl;
+            }
             pos = line.find("filename=");
             if (pos != std::string::npos)
             {
@@ -104,9 +116,11 @@ void Request::getInfo(std::string const &str)
                 this->_fileName = st;
                 // Saving filecontent
                 std::string::size_type bodyStart = str.find(lines[i + 1]) + lines[i + 1].length() + 3;
-                std::string::size_type bodyEnd = str.rfind(lines[lines.size() - 1]);
-                this->_fileContent = str.substr(bodyStart, bodyEnd - bodyStart);
-                std::cout << *this << std::endl;
+                std::string::size_type bodyEnd = this->_full_request.size() - this->_boundary.size() - 7;
+                for(size_t i = 0; (bodyStart + i) < bodyEnd; i++)
+                    this->_fileContent.push_back(this->_full_request[i + bodyStart]);
+                // Printing the info we just get
+                //std::cout << *this;
             }
         }
     }
@@ -119,7 +133,9 @@ std::ostream & operator<<(std::ostream &ost, const Request &src)
         << "-> PROTOCOL: " << src.getProtocol() << std::endl \
         << "-> CONNECTION: " << src.getConnection() << std::endl \
         << "-> HOST: " << src.getHost() << std::endl \
-        << "-> FILENAME: " << src.getFilename() << std::endl \
-        << "-> FILECONTENT: " << src.getFileContent() << std::endl;
+        << "-> FILENAME: " << src.getFilename() << std::endl;
+    ost << "-> FILECONTENT: ";
+    for (size_t i = 0; i < src._fileContent.size(); i++)
+        ost << src._fileContent[i];
     return ost;
 }

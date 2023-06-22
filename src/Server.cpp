@@ -20,14 +20,14 @@ Server::Server(Config conf)
 	this->_socketAddress.sin_port = htons(this->_port);
 	this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ip_address.c_str());
 }
-
 // ===== Destructor =====
 Server::~Server()
 {
 	close(this->_socket);
+	return ;
 }
 
-// ===== Methods =====
+// Create a socket, associate it with a address and listen for incoming connections
 int		Server::startServer(void)
 {
 	this->_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,13 +36,11 @@ int		Server::startServer(void)
 		throw serverException("Cannot create socket");
 		return (1);
 	}
-
 	if (bind(this->_socket, (sockaddr *)&this->_socketAddress, this->_socketAddress_len) < 0)
 	{
 		throw serverException("Cannot connect socket to address");
 		return (1);
 	}
-
 	if (listen(this->_socket, 20) < 0)
 	{
 		throw serverException("Socket listen failed");
@@ -51,53 +49,19 @@ int		Server::startServer(void)
 	return (0);
 }
 
-int	Server::startListen(void)
+// Delete a client socket
+int	Server::deleteClientSocket(int client_socket)
 {
-	printMessage("===== Listening =====");
-	printMessage("ADDRESS: " + std::string(inet_ntoa(this->_socketAddress.sin_addr)));
-	std::cout << "PORT: " << ntohs(this->_socketAddress.sin_port) << std::endl;
-
-	fd_set	current_sockets, ready_sockets;
-	int		max_socket;
-
-	// Initialize current set
-	FD_ZERO(&current_sockets);
-	FD_SET(this->_socket, &current_sockets);
-
-	max_socket = this->_socket;
-
-	while (1)
+	std::vector<int>::iterator it = std::find(this->_clientSockets.begin(), this->_clientSockets.end(), client_socket);
+	if (it != this->_clientSockets.end())
 	{
-		// Select is destructive
-		ready_sockets = current_sockets;
-
-		if (select(max_socket + 1, &ready_sockets, NULL, NULL, NULL) < 0)
-		{
-			throw serverException(strerror(errno));
-			return (1);
-		}
-		for (int i = 0; i <= max_socket; i++)
-		{
-			if (!FD_ISSET(i, &ready_sockets))
-				continue ; // write_set?
-			if (i == this->_socket)
-			{
-				// New connection
-				int new_socket = acceptConnection();
-				FD_SET(new_socket, &current_sockets);
-				if (new_socket > max_socket)
-					max_socket = new_socket;
-			}
-			else
-			{
-				handleConnection(i);
-				FD_CLR(i, &current_sockets);
-			}
-		}
+		std::copy(it + 1, this->_clientSockets.end(), it);
+		this->_clientSockets.pop_back();
 	}
 	return (0);
 }
 
+// Accept a incoming connection and save the socket
 int	Server::acceptConnection(void)
 {
 	int	new_socket;
@@ -111,18 +75,24 @@ int	Server::acceptConnection(void)
 	return (new_socket);
 }
 
+// Read a request and send a response
 int	Server::handleConnection(int client_socket)
 {
 	char	buffer[this->_config.client_max_body_size];
-	
+	std::vector<char> vecbuffer;
 	bzero(buffer, this->_config.client_max_body_size);
-	if (read(client_socket, buffer, this->_config.client_max_body_size) < 0)
+	int bytesread = read(client_socket, buffer, this->_config.client_max_body_size);
+	if (bytesread < 0)
 	{
 		throw serverException("Cannot read request");
 		return (1);
 	}
-
-	Request request(buffer);
+	//===================================================
+	// Bucle para copiar el contenido del array en el vector
+	for (int i = 0; i < bytesread; i++)
+		vecbuffer.push_back(buffer[i]);
+	Request request(vecbuffer);
+	//===================================================
 	Response response(this->_config, request);
 
 	response.generateResponse();
@@ -132,6 +102,16 @@ int	Server::handleConnection(int client_socket)
 	close(client_socket);
 	printMessage("Closing connection");
 	return (0);
+}
+
+// Send response to the client socket
+void Server::sendResponse(int client_socket)
+{
+	unsigned long bytesSent;
+
+	bytesSent = write(client_socket, _serverResponse.c_str(), _serverResponse.size());
+	if (bytesSent != _serverResponse.size())
+		printMessage("Error sending response to client");
 }
 
 // ===== Exception =====
@@ -144,39 +124,3 @@ const char *Server::serverException::what() const throw()
 {
 	return (this->_error);
 };
-
-
-
-std::string Server::buildResponse()
-{
-	std::string filePath = "index.html"; // Ruta del archivo HTML
-
-    std::ifstream file(filePath.c_str()); // Abrir el archivo en modo lectura
-    if (!file)
-    {
-        throw serverException("Failed to open html file");
-    }
-
-    std::ostringstream fileContentStream;
-    fileContentStream << file.rdbuf(); // Leer todo el contenido del archivo en un flujo de salida
-
-    std::string fileContent = fileContentStream.str();
-
-    std::ostringstream response;
-    response << "HTTP/1.1 200 OK\n"
-             << "Content-Type: text/html\n"
-             << "Content-Length: " << fileContent.size() << "\n\n"
-             << fileContent;
-
-    return response.str();
-}
-
-void Server::sendResponse(int client_socket)
-{
-	unsigned long bytesSent;
-
-	bytesSent = write(client_socket, _serverResponse.c_str(), _serverResponse.size());
-
-	if (bytesSent != _serverResponse.size())
-		printMessage("Error sending response to client");
-}

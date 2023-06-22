@@ -8,7 +8,7 @@
 
 class Server
 {
-private:
+public:
 	struct sockaddr_in	_socketAddress;
 	unsigned int		_socketAddress_len;
 	std::string			_ip_address;
@@ -16,6 +16,7 @@ private:
 	int					_port;
 	std::string			_serverResponse;
 	Config				_config;
+	std::vector<int>	_clientSockets;
 
 public:
 	// ===== Constructor =====
@@ -26,11 +27,9 @@ public:
 
 	// ===== Methods =====
 	int	startServer(void);
-	int	startListen(void);
 	int	acceptConnection(void);
 	int	handleConnection(int client_socket);
-	std::string buildResponse(void);
-	void sendResponse(int client_socket);
+	int	deleteClientSocket(int client_socket);
 
 	// ===== Exception =====
 	class serverException : public std::exception
@@ -42,6 +41,11 @@ public:
 		serverException(const char *error);
 		virtual const char *what() const throw();
     };
+
+private:
+	// ===== Private methods =====
+	std::string buildResponse(void);
+	void sendResponse(int client_socket);
 };
 
 #endif

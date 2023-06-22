@@ -18,6 +18,4 @@ enum METHOD
 	DELETE
 };
 
-extern Config	config;
-
 #endif

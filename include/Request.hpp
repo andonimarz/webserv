@@ -13,28 +13,29 @@
 class Request
 {
 	public:
-		Request(std::string const &str);
+		Request(std::vector<char> buf);
 		~Request();
-		void setFullRequest(std::string const &str);
-		std::string getFullRequest(void) const;
+		void setFullRequest(const std::vector<char> &src);
+		std::vector<char> getFullRequest(void) const;
 		std::string getMethod(void) const;
 		std::string getRoute(void) const;
 		std::string getProtocol(void) const;
 		std::string getHost(void) const;
 		std::string getConnection(void) const;
 		std::string getFilename(void) const;
-		std::string getFileContent(void) const;
-		void getInfo(std::string const &str);
+		std::vector<char> getFileContent(void) const;
+		void getInfo(void);
 		std::string _fileName; //POST
-		std::string _fileContent; //POST
+		std::vector<char> _fileContent; //POST
 	private:
-		std::string	_full_request;
+		std::vector<char> _full_request;
 		std::string	_method;
 		std::string	_route;
 		std::string	_protocol;
 		std::string _host;
 		std::string _connection;
-		std::string _boundary; //POST
+		std::string _boundary;
+		size_t		_contentLength;
 		/* int			_socket;
 
 		std::map<std::string, std::string>	header;
