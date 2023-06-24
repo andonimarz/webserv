@@ -1,5 +1,16 @@
 #include "Request.hpp"
 
+Request::Request(){
+    this->_method = "";
+    this->_route = "";
+    this->_protocol = "";
+    this->_host = "";
+    this->_connection = "";
+    this->_boundary = "";
+    this->_fileName = "";
+    this->_contentLength = 0;
+}
+
 Request::Request(std::vector<char> buf)
 {
     //std::cout << "[PRUEBAS_ANDONI] Generating request" << std::endl;
@@ -20,6 +31,18 @@ Request::Request(std::vector<char> buf)
 
 Request::~Request() {
     //std::cout << "[PRUEBAS_ANDONI] Destroying request" << std::endl;
+}
+
+bool Request::operator==(const Request& other) const
+{
+    return _full_request == other._full_request &&
+           _method == other._method &&
+           _route == other._route &&
+           _protocol == other._protocol &&
+           _host == other._host &&
+           _connection == other._connection &&
+           _fileName == other._fileName &&
+           _fileContent == other._fileContent;
 }
 
 void Request::setFullRequest(const std::vector<char> &src) {
@@ -56,6 +79,9 @@ std::string Request::getFilename(void) const {
 
 std::vector<char> Request::getFileContent(void) const {
     return this->_fileContent;
+}
+size_t Request::getContentLength(void) const{
+    return this->_contentLength;
 }
 
 void Request::getInfo(void)
@@ -97,6 +123,9 @@ void Request::getInfo(void)
                 {
                     std::istringstream iss(line.substr(pos + 1));
                     iss >> this->_contentLength;
+                    std::cout << "Content length: " << this->_contentLength << std::endl; 
+                    //if (this->_contentLength > 50000)
+                    //    throw std::invalid_argument("Error: file is too big");
                     //std::cout << "-> Content-Length: " << this->_contentLength << std::endl;
                 }
             }

@@ -9,21 +9,21 @@ void testConfigs(std::vector<Config> configs)
 		throw std::runtime_error("Error: invalid config file path.");
     for (size_t i = 0; i < configs.size(); i++)
     {
-        if (configs[i].host.empty())
+        if (configs[i].getHost().empty())
             throw std::runtime_error("Error: host is empty.");
-        if (configs[i].server_name.size() == 0)
+        if (configs[i].getSizeServerName() == 0)
             throw std::runtime_error("Error: server_name is empty.");
         // Checks if port is in registered ports range
-        if (1024 > configs[i].port || configs[i].port > 49151)
+        if (1024 > configs[i].getPort() || configs[i].getPort() > 49151)
             throw std::runtime_error("Error: invalid port number.");
         // Check if there are duplicated ports
-        if (std::find(ports.begin(), ports.end(), configs[i].port) != ports.end())
+        if (std::find(ports.begin(), ports.end(), configs[i].getPort()) != ports.end())
             throw std::runtime_error("Error: duplicated ports.");
-        ports.push_back(configs[i].port);
+        ports.push_back(configs[i].getPort());
         // Minitest for error_pages
-        testErrorPage(configs[i].error_page);
+        testErrorPage(configs[i].getErrorPages());
         // Minitests for location{}
-        testLocation(configs[i].location);
+        testLocation(configs[i].getLocations());
         /* for(size_t j = 0; j < configs[i].server_name.size(); j++)
         {
             if (std::find(hosts.begin(), hosts.end(), configs[i].server_name[j]) != hosts.end())

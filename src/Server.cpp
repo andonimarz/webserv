@@ -13,8 +13,8 @@
 Server::Server(Config conf)
 {
 	this->_config = conf;
-	this->_ip_address = this->_config.host;
-	this->_port = this->_config.port;
+	this->_ip_address = this->_config.getHost();
+	this->_port = this->_config.getPort();
 	this->_socketAddress_len = sizeof(_socketAddress);
 	this->_socketAddress.sin_family = AF_INET;
 	this->_socketAddress.sin_port = htons(this->_port);
@@ -27,6 +27,39 @@ Server::~Server()
 	return ;
 }
 
+// ===== Getters =====
+int	Server::getSocket(void)
+{
+	return (this->_socket);
+}
+int	Server::getClientSocket(int index)
+{
+	if (index < (int)this->_clientSockets.size())
+		return (this->_clientSockets[index]);
+	return (0);
+}
+int	Server::getSizeClientSockets(void)
+{
+	return ((int)this->_clientSockets.size());
+}
+
+// ===== Setters =====
+int	Server::pushClientSocket(int client_socket)
+{
+	this->_clientSockets.push_back(client_socket);
+	return (0);
+}
+int	Server::deleteClientSocket(int client_socket)
+{
+	std::vector<int>::iterator it = std::find(this->_clientSockets.begin(), this->_clientSockets.end(), client_socket);
+	if (it != this->_clientSockets.end())
+	{
+		std::copy(it + 1, this->_clientSockets.end(), it);
+		this->_clientSockets.pop_back();
+	}
+	return (0);
+}
+
 // Create a socket, associate it with a address and listen for incoming connections
 int		Server::startServer(void)
 {
@@ -36,27 +69,15 @@ int		Server::startServer(void)
 		throw serverException("Cannot create socket");
 		return (1);
 	}
-	if (bind(this->_socket, (sockaddr *)&this->_socketAddress, this->_socketAddress_len) < 0)
-	{
-		throw serverException("Cannot connect socket to address");
-		return (1);
-	}
+	std::cout << "Connecting server socket to"
+	<< "\nADDRESS: " << inet_ntoa(this->_socketAddress.sin_addr)
+	<< "\nPORT: " << ntohs(this->_socketAddress.sin_port) << std::endl;
+	while (bind(this->_socket, (sockaddr *)&this->_socketAddress, this->_socketAddress_len) < 0){}
+	std::cout << "===== Connection done! =====\n" << std::endl;
 	if (listen(this->_socket, 20) < 0)
 	{
 		throw serverException("Socket listen failed");
 		return (1);
-	}
-	return (0);
-}
-
-// Delete a client socket
-int	Server::deleteClientSocket(int client_socket)
-{
-	std::vector<int>::iterator it = std::find(this->_clientSockets.begin(), this->_clientSockets.end(), client_socket);
-	if (it != this->_clientSockets.end())
-	{
-		std::copy(it + 1, this->_clientSockets.end(), it);
-		this->_clientSockets.pop_back();
 	}
 	return (0);
 }
@@ -78,25 +99,36 @@ int	Server::acceptConnection(void)
 // Read a request and send a response
 int	Server::handleConnection(int client_socket)
 {
-	char	buffer[this->_config.client_max_body_size];
-	std::vector<char> vecbuffer;
-	bzero(buffer, this->_config.client_max_body_size);
-	int bytesread = read(client_socket, buffer, this->_config.client_max_body_size);
-	if (bytesread < 0)
-	{
-		throw serverException("Cannot read request");
-		return (1);
+	Request request;
+	try {
+		char	buffer[this->_config.getClientMaxBodySize()];
+		std::vector<char> vecbuffer;
+		size_t bytesread = 1;
+		bzero(buffer, this->_config.getClientMaxBodySize());
+		while (bytesread > 0)
+		{
+			std::cout << "Bytes read: " << bytesread << std::endl;
+			bytesread = read(client_socket, buffer, this->_config.getClientMaxBodySize());
+			if (bytesread < 0)
+			{
+				throw serverException("Cannot read request");
+				return (1);
+			}
+			for (size_t i = 0; i < bytesread; i++)
+				vecbuffer.push_back(buffer[i]);
+		}
+		Request tmp(vecbuffer);
+		if (tmp.getContentLength() > (unsigned long)this->_config.getClientMaxBodySize())
+			throw serverException("Error: body is too big");
+		request = tmp;
 	}
-	//===================================================
-	// Bucle para copiar el contenido del array en el vector
-	for (int i = 0; i < bytesread; i++)
-		vecbuffer.push_back(buffer[i]);
-	Request request(vecbuffer);
-	//===================================================
+	catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+	}
 	Response response(this->_config, request);
 
 	response.generateResponse();
-	_serverResponse = response._fullResponse;
+	_serverResponse = response._getFullResponse();
 
 	sendResponse(client_socket);
 	close(client_socket);

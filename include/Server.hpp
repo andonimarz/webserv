@@ -8,7 +8,7 @@
 
 class Server
 {
-public:
+private:
 	struct sockaddr_in	_socketAddress;
 	unsigned int		_socketAddress_len;
 	std::string			_ip_address;
@@ -24,6 +24,14 @@ public:
 
 	// ===== Destructor =====
 	~Server();
+
+	// ===== Getters =====
+	int	getSocket(void);
+	int	getClientSocket(int index);
+	int	getSizeClientSockets(void);
+
+	// ===== Setters =====
+	int	pushClientSocket(int client_socket);
 
 	// ===== Methods =====
 	int	startServer(void);

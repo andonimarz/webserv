@@ -14,8 +14,6 @@ Route::Route(std::vector<Config> config_list)
 		this->_server_list.push_back(Server(config_list[i]));
 	for (int i = 0; i < (int)this->_server_list.size(); i++)
 		this->_server_list[i].startServer();
-	for (int i = 0; i < (int)this->_server_list.size(); i++)
-		this->_server_list[i]._config.printConf();
 	return ;
 }
 // ===== Destructor =====
@@ -28,9 +26,9 @@ int	Route::startListen(void)
 
 	FD_ZERO(&this->_currentSockets);
 	for (j = 0; j < (int)this->_server_list.size(); j++)
-		FD_SET(this->_server_list[j]._socket, &this->_currentSockets);
+		FD_SET(this->_server_list[j].getSocket(), &this->_currentSockets);
 
-	this->_maxSocket = this->_server_list[j - 1]._socket;
+	this->_maxSocket = this->_server_list[j - 1].getSocket();
 	this->selectRequest();
 	return (0);
 }
@@ -63,27 +61,34 @@ int	Route::redirectRequest(int socket_selected)
 {
 	for (int j = 0; j < (int)this->_server_list.size(); j++)
 	{
-		if (socket_selected == this->_server_list[j]._socket)
+		if (socket_selected == this->_server_list[j].getSocket())
 		{
 			int new_socket = this->_server_list[j].acceptConnection();
 			FD_SET(new_socket, &this->_currentSockets);
 			if (new_socket > this->_maxSocket)
 				this->_maxSocket = new_socket;
-			this->_server_list[j]._clientSockets.push_back(new_socket);
+			this->_server_list[j].pushClientSocket(new_socket);
 			break ;
 		}
 		else
 		{
 			int k;
-			for (k = 0; k < (int)this->_server_list[j]._clientSockets.size(); k++)
+			for (k = 0; k < this->_server_list[j].getSizeClientSockets(); k++)
 			{
-				if (socket_selected != this->_server_list[j]._clientSockets[k])
+				if (socket_selected != this->_server_list[j].getClientSocket(k))
 					continue ;
-				this->_server_list[j].handleConnection(socket_selected);
+				try
+				{
+					this->_server_list[j].handleConnection(socket_selected);
+				}
+				catch (std::exception &e)
+				{
+					std::cerr << e.what() << std::endl;
+				}
 				this->_server_list[j].deleteClientSocket(socket_selected);
 				FD_CLR(socket_selected, &this->_currentSockets);
 			}
-			if (k < (int)this->_server_list[j]._clientSockets.size())
+			if (k < this->_server_list[j].getSizeClientSockets())
 				break ;
 		}
 	}

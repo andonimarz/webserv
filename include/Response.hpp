@@ -5,7 +5,7 @@
 
 class Response
 {
-public:
+private:
 	std::string	_fullResponse;
 	std::string	_fullPath;
 	Request		_request;
@@ -20,6 +20,9 @@ public:
 	Response(const Config conf, Request const &request);
 	// ===== Destructor =====
 	~Response();
+
+	// ===== Getters =====
+	std::string	_getFullResponse(void);
 
 	// ===== Methods =====
 	int	generateResponse(void);

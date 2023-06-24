@@ -3,7 +3,6 @@
 
 #include "web_server.hpp"
 #include "utils_config.hpp"
-// #include "Server.hpp"
 #include <vector>
 #include <map>
 #include <iostream>
@@ -37,7 +36,7 @@ class Config
 			bool				upload_enable;
 		}				t_location;
 
-	public:
+	private:
 		std::vector<t_error_page>	error_page;
 		std::vector<t_location>		location;
 		std::vector<std::string>	server_name;
@@ -53,6 +52,17 @@ class Config
 		Config(const Config &src);
 		// Destructor
 		~Config();
+
+		// ===== Getters =====
+		t_error_page	getErrorPage(int index);
+		std::string		getHost(void);
+		t_location		getLocation(int index);
+		int				getPort(void);
+		int				getClientMaxBodySize(void);
+		int				getSizeLocation(void);
+		size_t			getSizeServerName(void);
+		std::vector<t_error_page>	getErrorPages(void);
+		std::vector<t_location>		getLocations(void);
 
 		Config	&operator=(const Config &src);
 
