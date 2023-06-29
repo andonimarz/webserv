@@ -29,10 +29,6 @@ Request::Request(std::vector<char> buf)
         std::cout << buf[i]; */
 }
 
-Request::~Request() {
-    //std::cout << "[PRUEBAS_ANDONI] Destroying request" << std::endl;
-}
-
 bool Request::operator==(const Request& other) const
 {
     return _full_request == other._full_request &&
@@ -43,6 +39,10 @@ bool Request::operator==(const Request& other) const
            _connection == other._connection &&
            _fileName == other._fileName &&
            _fileContent == other._fileContent;
+}
+
+Request::~Request() {
+    //std::cout << "[PRUEBAS_ANDONI] Destroying request" << std::endl;
 }
 
 void Request::setFullRequest(const std::vector<char> &src) {
@@ -80,6 +80,7 @@ std::string Request::getFilename(void) const {
 std::vector<char> Request::getFileContent(void) const {
     return this->_fileContent;
 }
+
 size_t Request::getContentLength(void) const{
     return this->_contentLength;
 }
@@ -123,9 +124,6 @@ void Request::getInfo(void)
                 {
                     std::istringstream iss(line.substr(pos + 1));
                     iss >> this->_contentLength;
-                    std::cout << "Content length: " << this->_contentLength << std::endl; 
-                    //if (this->_contentLength > 50000)
-                    //    throw std::invalid_argument("Error: file is too big");
                     //std::cout << "-> Content-Length: " << this->_contentLength << std::endl;
                 }
             }
@@ -163,8 +161,9 @@ std::ostream & operator<<(std::ostream &ost, const Request &src)
         << "-> CONNECTION: " << src.getConnection() << std::endl \
         << "-> HOST: " << src.getHost() << std::endl \
         << "-> FILENAME: " << src.getFilename() << std::endl;
-    ost << "-> FILECONTENT: ";
+    /* ost << "-> FILECONTENT: ";
     for (size_t i = 0; i < src._fileContent.size(); i++)
         ost << src._fileContent[i];
+     */
     return ost;
 }

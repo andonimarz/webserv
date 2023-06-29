@@ -99,38 +99,32 @@ int	Server::acceptConnection(void)
 // Read a request and send a response
 int	Server::handleConnection(int client_socket)
 {
+	size_t buffeSize = this->_config.getClientMaxBodySize() + 1024;
+	char	buffer[buffeSize];
 	Request request;
-	try {
-		char	buffer[this->_config.getClientMaxBodySize()];
-		std::vector<char> vecbuffer;
-		size_t bytesread = 1;
-		bzero(buffer, this->_config.getClientMaxBodySize());
-		while (bytesread > 0)
-		{
-			std::cout << "Bytes read: " << bytesread << std::endl;
-			bytesread = read(client_socket, buffer, this->_config.getClientMaxBodySize());
-			if (bytesread < 0)
-			{
-				throw serverException("Cannot read request");
-				return (1);
-			}
-			for (size_t i = 0; i < bytesread; i++)
-				vecbuffer.push_back(buffer[i]);
-		}
-		Request tmp(vecbuffer);
-		if (tmp.getContentLength() > (unsigned long)this->_config.getClientMaxBodySize())
-			throw serverException("Error: body is too big");
+	bzero(buffer, buffeSize);
+	int bytesread = read(client_socket, buffer, buffeSize);
+	if (bytesread < 0)
+		throw serverException("Cannot read request");
+	std::vector<char> vecbuffer;
+	for (int i = 0; i < bytesread; i++)
+		vecbuffer.push_back(buffer[i]);
+	Request tmp(vecbuffer);
+	if ((int)tmp.getContentLength() <= this->_config.getClientMaxBodySize())
 		request = tmp;
-	}
-	catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
-	}
+	else
+		std::cout << "Error: Body is too big! Using an empty request" << std::endl;
+	std::cout << "--------Request:\n" << request;
 	Response response(this->_config, request);
-
+	std::cout << "Response constructor finished" << std::endl;
 	response.generateResponse();
+	std::cout << "generateResponse() finished" << std::endl;
 	_serverResponse = response._getFullResponse();
+	std::cout << "getFullResponse() finished" << std::endl;
+	//std::cout << "RESPONSE:\n" << _serverResponse << std::endl;
 
 	sendResponse(client_socket);
+	std::cout << "sendResponse() finished" << std::endl;
 	close(client_socket);
 	printMessage("Closing connection");
 	return (0);

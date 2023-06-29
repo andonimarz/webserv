@@ -182,6 +182,8 @@ void Config::fillFields(const std::string &src)
 {
 	std::istringstream iss(src);
 	std::vector<std::string> lines;
+	std::vector<std::string> firstWords;
+	std::vector<std::string> locationWords;
 	std::string line;
 	bool inLocation = 0;
 	std::size_t locationIndex = 0;
@@ -196,6 +198,28 @@ void Config::fillFields(const std::string &src)
 		if (lines[i].empty() || (lines[i].length() <= 2 && lines[i].find("}") == std::string::npos))
 			continue;
 		std::vector<std::string> words = fillWords(lines[i]);
+		// Comprobar que no haya campos duplicados
+		std::vector<std::string>::const_iterator it;
+		if (words[0] != "location" && words[0] != "error_page")
+		{
+			if (inLocation == 0)
+			{
+				for (it = firstWords.begin(); it != firstWords.end(); ++it)
+					if (*it == words[0])
+						throw std::runtime_error("Error: field '" + words[0] + "' duplicated.");
+				firstWords.push_back(words[0]);
+			}
+			else
+			{
+				if (words[0] != "method")
+					for (it = locationWords.begin(); it != locationWords.end(); ++it)
+						if (*it == words[0])
+							throw std::runtime_error("Error: field '" + words[0] + "' duplicated in location.");
+				locationWords.push_back(words[0]);
+			}
+		}
+		if (words[0] == "server")
+			continue;
 		// Agregar un comentario para cada palabra clave encontrada
 		if (words[0] == "listen")
 			saveListen(words);
@@ -231,9 +255,12 @@ void Config::fillFields(const std::string &src)
 					if (location[locationIndex].autoindex == true)
 						location[locationIndex].index = "index.html";
 					inLocation = 0;
+					locationWords.clear();
 				}
 			}
 		}
+		else
+			throw std::runtime_error("Error: unknown field parameter '" + words[0] + "'");
 	}
 }
 

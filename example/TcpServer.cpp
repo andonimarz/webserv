@@ -102,7 +102,7 @@ namespace http
 			ss << "------ Received Request from client ------\n\n";
 			log(ss.str());
 
-			std::cout << buffer << std::endl;
+			//std::cout << buffer << std::endl;
 
 			// sendResponse(); ====================================================
 

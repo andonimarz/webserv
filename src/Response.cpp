@@ -49,16 +49,23 @@ int	Response::generateResponse(void)
     	ss << this->_config.getPort();
 		this->_config.exportEnv("CONFIG_PORT", ss.str());
 	}
+	std::cout << "PRE CGI" << std::endl;
 	executeCGI();
+	std::cout << "POST CGI" << std::endl;
 	return (0);
 }
 
 // Check if request path exists
 int	Response::checkRoute(void)
 {
-	int	i;
+	int	i = 0;
 	this->_routeExist = false;
 
+	if (_request.getHost() == "")
+	{
+		setErrorPage(403);
+		return (i);
+	}
 	getRoutes();
 	for (i = 0; i < this->_config.getSizeLocation() && this->_routeExist == false; i++)
 	{
@@ -176,6 +183,8 @@ int	Response::setErrorPage(int error)
 {
 	int	i;
 
+	if (_errorPage != 0)
+		return (0);
 	this->_config.exportEnv("REQUEST_METHOD", "GET");
 	_errorPage = error;
 	for (i = 0; i < 3; i++)
@@ -214,10 +223,14 @@ int	Response::executeCGI(void)
 	else
 	{
 		close(fd[1]);
+		std::cout << "Esperando al hijo, path: " << (char *)_fullPath.c_str() << std::endl;
 		waitpid(pid, NULL, 0);
+		std::cout << "El hijo ha terminado" << std::endl;
 		int fd_response = dup(fd[0]);
 		close(fd[0]);
+		std::cout << "readFileDescriptor() ha empezado" << std::endl;
 		_fullResponse = readFileDescriptor(fd_response);
+		std::cout << "readFileDescriptor() ha terminado" << std::endl;
 	}
 	return (0);
 }
