@@ -144,6 +144,8 @@ void Request::getInfo(void)
                 // Saving filecontent
                 std::string::size_type bodyStart = str.find(lines[i + 1]) + lines[i + 1].length() + 3;
                 std::string::size_type bodyEnd = this->_full_request.size() - this->_boundary.size() - 7;
+                std::string str(this->_full_request.begin() + bodyEnd, this->_full_request.end());
+                //std::cout << "EY--------------->>>>> " << str << std::endl;
                 for(size_t i = 0; (bodyStart + i) < bodyEnd; i++)
                     this->_fileContent.push_back(this->_full_request[i + bodyStart]);
                 // Printing the info we just get

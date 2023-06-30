@@ -49,9 +49,7 @@ int	Response::generateResponse(void)
     	ss << this->_config.getPort();
 		this->_config.exportEnv("CONFIG_PORT", ss.str());
 	}
-	std::cout << "PRE CGI" << std::endl;
 	executeCGI();
-	std::cout << "POST CGI" << std::endl;
 	return (0);
 }
 
@@ -207,6 +205,8 @@ int	Response::executeCGI(void)
 	int		pid;
 	char	*cgi_args[] = {(char *)"./cgi/cgi.sh", (char *)_fullPath.c_str(), NULL};
 
+	this->_config.printEnv();
+
 	if (pipe(fd) == -1)
 		return (1);
 	pid = fork();
@@ -219,6 +219,8 @@ int	Response::executeCGI(void)
 		dup2(fd[1], 1);
 		close(fd[1]);
 		execve(*cgi_args, cgi_args, env);
+		std::cerr << "Error: CGI failed." << std::endl;
+		exit(0);
 	}
 	else
 	{
@@ -228,9 +230,9 @@ int	Response::executeCGI(void)
 		std::cout << "El hijo ha terminado" << std::endl;
 		int fd_response = dup(fd[0]);
 		close(fd[0]);
-		std::cout << "readFileDescriptor() ha empezado" << std::endl;
+		//std::cout << "readFileDescriptor() ha empezado" << std::endl;
 		_fullResponse = readFileDescriptor(fd_response);
-		std::cout << "readFileDescriptor() ha terminado" << std::endl;
+		//std::cout << "readFileDescriptor() ha terminado" << std::endl;
 	}
 	return (0);
 }
