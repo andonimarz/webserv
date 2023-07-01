@@ -105,7 +105,7 @@ int	Server::handleConnection(int client_socket)
 	std::string line = "";
 	Request request;
 	int bytesread = 1;
-	std::cout << "Reading request: " << std::endl;
+	std::cout << "[REQUEST] Reading request: " << std::endl;
 	while (bytesread > 0 && line != "\r\n")
 	{
 		bzero(buffer, buffeSize);
@@ -118,16 +118,25 @@ int	Server::handleConnection(int client_socket)
 			if (buffer[i] == '\n') {
 				if (line == "\r") {
 					Request tmp(vecbuffer);
-					std::cout << "Printing header buffer:" << std::endl;
+					
+					// ====TODO ESTO SOBRA CUANDO FUNCIONE!====
+					std::cout << "[REQUEST] Printing header buffer:" << std::endl;
 					for (size_t i = 0; i < vecbuffer.size(); i++)
 						std::cout << vecbuffer[i];
+
 					vecbuffer.clear();
+					if (tmp.getContentLength())
+						tmp.setFileContent(client_socket);
 					if ((int)tmp.getContentLength() <= this->_config.getClientMaxBodySize())
 						request = tmp;
 					else
 						std::cout << "Error: Body is too big! Using an empty request" << std::endl;
-					std::cout << "Hasta aqui: " << line << std::endl;
-					std::cout << request << std::endl;
+					
+
+					// ====TODO ESTO SOBRA CUANDO FUNCIONE!====
+					std::cout << "[REQUEST] Hasta aqui: " << std::endl \
+						<< request << std::endl << "[REQUEST] Hasta aqui" << std::endl;
+					
 					bytesread = 0;
 				} else {
 				vecbuffer.insert(vecbuffer.end(), line.begin(), line.end());

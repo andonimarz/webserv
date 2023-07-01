@@ -1,4 +1,5 @@
 #include "Request.hpp"
+#include <string.h>
 
 Request::Request(){
     this->_method = "";
@@ -133,7 +134,7 @@ void Request::getInfo(void)
                 this->_boundary = line.substr(pos + 9);
                 //std::cout << "-> Boundary: " << this->_boundary << std::endl;
             }
-            pos = line.find("filename=");
+            /* pos = line.find("filename=");
             if (pos != std::string::npos)
             {
                 // Saving filename
@@ -150,8 +151,41 @@ void Request::getInfo(void)
                     this->_fileContent.push_back(this->_full_request[i + bodyStart]);
                 // Printing the info we just get
                 //std::cout << *this;
-            }
+            } */
         }
+    }
+}
+
+void Request::setFileContent(int clilent_socket)
+{
+    int bytesread = 0;
+    char buffer[this->_contentLength];
+    bzero(buffer, this->_contentLength);
+    std::cout << "[REQUEST] Empieza setFileContent()" << std::endl;
+    bytesread = read(clilent_socket, buffer, this->_contentLength);
+    std::cout << "[REQUEST] Bytes read = " << bytesread << std::endl;
+    std::cout << "[REQUEST] Content length = " << this->_contentLength << std::endl;
+    /* for (size_t i = 0; i < (size_t)bytesread; i++)
+        std::cout << buffer[i]; */
+    std::string body(buffer, bytesread);
+    std::cout << body << std::endl;
+    std::string::size_type pos = body.find("filename=") + 9;
+
+    if (pos != std::string::npos)
+    {
+        // Saving filename
+        std::string st = body.substr(pos, body.find("\n", pos) - pos);
+        st.erase(std::remove(st.begin(), st.end(), '\"'), st.end());
+        st.erase(std::remove(st.begin(), st.end(), '\r'), st.end());
+        this->_fileName = st;
+
+        // Saving filecontent
+        std::string::size_type bodyStart = body.find("\r\n\r\n", pos) + 4;
+        std::string::size_type bodyEnd = body.size() - this->_boundary.size() - 7;
+        std::string str(buffer[bodyEnd], bytesread - bodyEnd);
+        std::cout << "EY--------------->>>>> " << str << std::endl;
+        for(size_t i = 0; (bodyStart + i) < bodyEnd; i++)
+            this->_fileContent.push_back(buffer[i + bodyStart]);
     }
 }
 
@@ -162,10 +196,10 @@ std::ostream & operator<<(std::ostream &ost, const Request &src)
         << "-> PROTOCOL: " << src.getProtocol() << std::endl \
         << "-> CONNECTION: " << src.getConnection() << std::endl \
         << "-> HOST: " << src.getHost() << std::endl \
+        << "-> CONTENT LENGHT: " << src.getContentLength() << std::endl \
         << "-> FILENAME: " << src.getFilename() << std::endl;
     /* ost << "-> FILECONTENT: ";
     for (size_t i = 0; i < src._fileContent.size(); i++)
-        ost << src._fileContent[i];
-     */
+        ost << src._fileContent[i]; */
     return ost;
 }
