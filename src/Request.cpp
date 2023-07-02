@@ -158,34 +158,47 @@ void Request::getInfo(void)
 
 void Request::setFileContent(int clilent_socket)
 {
-    int bytesread = 0;
-    char buffer[this->_contentLength];
-    bzero(buffer, this->_contentLength);
+    int bytesToRead = 1024;
+    std::vector<char> vecBody;
+    int totalRead = 0;
+    char buffer[bytesToRead];
     std::cout << "[REQUEST] Empieza setFileContent()" << std::endl;
-    bytesread = read(clilent_socket, buffer, this->_contentLength);
-    std::cout << "[REQUEST] Bytes read = " << bytesread << std::endl;
+    int readNum = this->_contentLength / bytesToRead;
+    if (this->_contentLength % bytesToRead)
+        readNum++;
     std::cout << "[REQUEST] Content length = " << this->_contentLength << std::endl;
-    /* for (size_t i = 0; i < (size_t)bytesread; i++)
-        std::cout << buffer[i]; */
-    std::string body(buffer, bytesread);
-    std::cout << body << std::endl;
-    std::string::size_type pos = body.find("filename=") + 9;
+    for(int i = 0; i < readNum; i++)
+    {
+        bzero(buffer, bytesToRead);
+        int bytesRead = read(clilent_socket, buffer, bytesToRead);
+        if (bytesRead > 0)
+        {
+            std::cout << "[REQUEST] Bytes read = " << bytesRead << std::endl;
+            for (int i = 0; i < bytesRead; i++)
+                vecBody.push_back(buffer[i]);
+            totalRead += bytesRead;
+        }
+    }
+    std::cout << "[REQUEST] Total read = " << totalRead << std::endl;
+    std::string strBody(vecBody.begin(), vecBody.end());
+    std::string::size_type pos = strBody.find("filename=") + 9;
 
     if (pos != std::string::npos)
     {
         // Saving filename
-        std::string st = body.substr(pos, body.find("\n", pos) - pos);
+        std::string st = strBody.substr(pos, strBody.find("\n", pos) - pos);
         st.erase(std::remove(st.begin(), st.end(), '\"'), st.end());
         st.erase(std::remove(st.begin(), st.end(), '\r'), st.end());
         this->_fileName = st;
 
         // Saving filecontent
-        std::string::size_type bodyStart = body.find("\r\n\r\n", pos) + 4;
-        std::string::size_type bodyEnd = body.size() - this->_boundary.size() - 7;
-        std::string str(buffer[bodyEnd], bytesread - bodyEnd);
-        std::cout << "EY--------------->>>>> " << str << std::endl;
+        std::string::size_type bodyStart = strBody.find("\r\n\r\n", pos) + 4;
+        std::string::size_type bodyEnd = strBody.size() - this->_boundary.size() - 5;
+        std::string str(vecBody.begin() + bodyEnd, vecBody.end());
         for(size_t i = 0; (bodyStart + i) < bodyEnd; i++)
-            this->_fileContent.push_back(buffer[i + bodyStart]);
+            this->_fileContent.push_back(vecBody[i + bodyStart]);
+        std::cout << *this << std::endl;
+        std::cout << "[PRUEBAS] BOUNDARY DE CIERRE -> " << str << std::endl;
     }
 }
 

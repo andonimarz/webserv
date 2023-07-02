@@ -2,6 +2,7 @@ NAME			=	webserv
 SRC_DIR			=	src
 OBJ_DIR 		=	obj
 INC_DIR			=	include
+UPL_DIR			=	www/uploads
 
 RM				=	rm -rf
 CC				=	c++
@@ -44,6 +45,7 @@ all:	$(NAME)
 
 clean:
 	@$(RM) $(OBJ) $(OBJ_DIR)
+	@$(RM) $(UPL_DIR)
 	@echo "\n${GREEN}---------------------- Cleaned! ----------------------${RESET}\n"
 
 fclean:	clean

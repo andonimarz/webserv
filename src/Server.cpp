@@ -105,7 +105,7 @@ int	Server::handleConnection(int client_socket)
 	std::string line = "";
 	Request request;
 	int bytesread = 1;
-	std::cout << "[REQUEST] Reading request: " << std::endl;
+	// std::cout << "[REQUEST] Reading request: " << std::endl;
 	while (bytesread > 0 && line != "\r\n")
 	{
 		bzero(buffer, buffeSize);
@@ -119,10 +119,10 @@ int	Server::handleConnection(int client_socket)
 				if (line == "\r") {
 					Request tmp(vecbuffer);
 					
-					// ====TODO ESTO SOBRA CUANDO FUNCIONE!====
+					/* // ====TODO ESTO SOBRA CUANDO FUNCIONE!====
 					std::cout << "[REQUEST] Printing header buffer:" << std::endl;
 					for (size_t i = 0; i < vecbuffer.size(); i++)
-						std::cout << vecbuffer[i];
+						std::cout << vecbuffer[i]; */
 
 					vecbuffer.clear();
 					if (tmp.getContentLength())
@@ -133,9 +133,9 @@ int	Server::handleConnection(int client_socket)
 						std::cout << "Error: Body is too big! Using an empty request" << std::endl;
 					
 
-					// ====TODO ESTO SOBRA CUANDO FUNCIONE!====
+					/* // ====TODO ESTO SOBRA CUANDO FUNCIONE!====
 					std::cout << "[REQUEST] Hasta aqui: " << std::endl \
-						<< request << std::endl << "[REQUEST] Hasta aqui" << std::endl;
+						<< request << std::endl << "[REQUEST] Hasta aqui" << std::endl; */
 					
 					bytesread = 0;
 				} else {
@@ -148,7 +148,7 @@ int	Server::handleConnection(int client_socket)
 			}
 		}
 	}
-	std::cout << "Bucle terminado!" << std::endl;
+	// std::cout << "Bucle terminado!" << std::endl;
 	Response response(this->_config, request);
 	response.generateResponse();
 	_serverResponse = response._getFullResponse();

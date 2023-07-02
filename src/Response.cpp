@@ -205,7 +205,7 @@ int	Response::executeCGI(void)
 	int		pid;
 	char	*cgi_args[] = {(char *)"./cgi/cgi.sh", (char *)_fullPath.c_str(), NULL};
 
-	this->_config.printEnv();
+	//this->_config.printEnv();
 
 	if (pipe(fd) == -1)
 		return (1);

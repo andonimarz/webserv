@@ -48,39 +48,14 @@ then
     fi    
 fi
 
-# Ya esta comprobado que el archivo no existe
 if [ "$REQUEST_METHOD" == "POST" ]; then
-    # Obtener la extensión del archivo
-    filename=$(basename "$REQUEST_FILE")
-    extension="${filename##*.}"
-
-    # Establecer el tipo de contenido en función de la extensión
-    case "$extension" in
-        jpg|jpeg)
-            content_type="image/jpeg"
-            ;;
-        png)
-            content_type="image/png"
-            ;;
-        gif)
-            content_type="image/gif"
-            ;;
-        # Agrega más extensiones y tipos de contenido según sea necesario
-
-        # *)
-        #     content_type=""
-        #     ;;
-    esac
-
-    content_length=$(wc -c < "$REQUEST_FILE")
     echo "HTTP/1.1 $REQUEST_STATUS OK"
-    if [ -z "$content_type" ]; then
-        echo "Content-Type: $content_type"
-    fi
-    echo "Content-Length: $content_length"
+    echo "Content-Type: text/plain"
+    echo "Content-Length: 24"
     echo ""
-    cat "$REQUEST_FILE"
+    echo "El archivo se ha subido con éxito."
 fi
+
 
 
 if [ "$REQUEST_METHOD" == "DELETE" ]
